@@ -2,11 +2,24 @@
 
 namespace InternetShop.Users
 {
-    public class Admin : User
+    public class Admin : User , IAdmin
     {
         public Admin(string userName, string password) : base(userName, password)
         {
         }
-        
+        public void CreateNewItem(string itemName, double itemPrice)
+        {
+            Shop.CreateNewShopItem(itemName,itemPrice);
+        }
+
+        public void DeleteItem(string itemName)
+        {
+            Shop.DeleteShopItem(itemName);
+        }
+
+        public override ShopItem SearchShopItem(string itemName)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using InternetShop.Users;
 
 namespace InternetShop.Shop
 {
     public class OnlineShop : IShop
     {
         private const int TableWidth = 150;
+        private readonly List<User> _users = new List<User>();
         private readonly List<ShopItem> _productList = new List<ShopItem>();
 
         // Interface methods
@@ -30,6 +32,20 @@ namespace InternetShop.Shop
 
         // Class methods
 
+        public void LoadUsersList()
+        {
+            
+        }
+        public User Login(string userName, string password)
+        {
+            foreach (var user in _users)
+            {
+                if (user.Login(userName, password)) return user;
+            }
+            return null;
+        }
+        
+        // Print methods
         public void PrintProductList()
         {
             int count = _productList.Count;

@@ -1,4 +1,5 @@
-﻿namespace InternetShop.Shop
+﻿
+namespace InternetShop.Shop
 {
     public interface IShop
     {

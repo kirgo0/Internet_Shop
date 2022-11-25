@@ -39,12 +39,18 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="DataLoader\DataLoader.cs" />
+        <Compile Include="DataLoader\Loader.cs" />
+        <Compile Include="DataLoader\ShopItemsLoader.cs" />
+        <Compile Include="DataLoader\UsersDataLoader.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Shop\IShop.cs" />
         <Compile Include="Shop\OnlineShop.cs" />
         <Compile Include="Shop\ShopItem.cs" />
         <Compile Include="Users\Admin.cs" />
+        <Compile Include="Users\DefaultUser.cs" />
+        <Compile Include="Users\IAdmin.cs" />
         <Compile Include="Users\User.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
