@@ -1,4 +1,5 @@
-﻿using InternetShop.Shop;
+﻿using System;
+using InternetShop.Shop;
 
 namespace InternetShop.Users
 {
@@ -9,8 +10,9 @@ namespace InternetShop.Users
         }
 
         public override ShopItem SearchShopItem(string itemName)
-        {
-            throw new System.NotImplementedException();
+        {            
+            Console.WriteLine(Shop.SearchShopItem(itemName) != null ? "Item Founded" : "Item not founded");
+            return Shop.SearchShopItem(itemName);
         }
     }
 }

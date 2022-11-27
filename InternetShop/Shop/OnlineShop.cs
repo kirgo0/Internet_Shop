@@ -36,11 +36,37 @@ namespace InternetShop.Shop
         {
             
         }
+
+        public User SignUp(string userName, string password, string passwordRepeat)
+        {
+            if (GetUser(userName) == null)
+            {
+                if (password == passwordRepeat)
+                {
+                    User newUser = new DefaultUser(userName, password);
+                    _users.Add(newUser);
+                    newUser.GetShop(this);
+                    return newUser;
+                }
+            }
+            return null;
+        }
         public User Login(string userName, string password)
+        {
+            if(GetUser(userName) != null)
+                if (GetUser(userName).Login(userName, password))
+                {
+                    GetUser(userName).GetShop(this);
+                    return GetUser(userName);
+                }
+            return null;
+        }
+
+        private User GetUser(string userName)
         {
             foreach (var user in _users)
             {
-                if (user.Login(userName, password)) return user;
+                if (user.UserName == userName) return user;
             }
             return null;
         }
