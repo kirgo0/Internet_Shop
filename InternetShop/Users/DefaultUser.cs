@@ -11,8 +11,8 @@ namespace InternetShop.Users
 
         public override ShopItem SearchShopItem(string itemName)
         {            
-            Console.WriteLine(Shop.SearchShopItem(itemName) != null ? "Item Founded" : "Item not founded");
-            return Shop.SearchShopItem(itemName);
+            Console.WriteLine(Shop.GetShopItem(itemName) != null ? "Item Founded" : "Item not founded");
+            return Shop.GetShopItem(itemName);
         }
     }
 }

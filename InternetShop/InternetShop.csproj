@@ -46,6 +46,7 @@
         <Compile Include="Shop\IShop.cs" />
         <Compile Include="Shop\OnlineShop.cs" />
         <Compile Include="Shop\ShopItem.cs" />
+        <Compile Include="Shop\ShopItemExtended.cs" />
         <Compile Include="Users\Admin.cs" />
         <Compile Include="Users\DefaultUser.cs" />
         <Compile Include="Users\IAdmin.cs" />
