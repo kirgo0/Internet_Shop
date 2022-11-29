@@ -10,20 +10,20 @@ namespace InternetShop.Users
         protected IShop Shop { get; set; }
         public string UserName { get; set; }
         private string Password { get; set; }
-        private double _balance;
+        private double _balance; 
 
-        private double UserBalance
+        public double UserBalance
         {
             get => _balance;
             set => _balance += value;
         }
-        private readonly List<ShopItem> _basket;
-        private List<ShopItem> _purchaseHistory;
+        public readonly List<ShopItem> Cart;
+        public readonly List<ShopItem> PurchaseHistory;
 
         protected User(List<ShopItem> basket, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, double userBalance)
         {
-            _basket = basket;
-            _purchaseHistory = purchaseHistory;
+            Cart = basket;
+            PurchaseHistory = purchaseHistory;
             Shop = shop;
             UserName = userName;
             Password = password;
@@ -35,8 +35,8 @@ namespace InternetShop.Users
             UserName = userName;
             Password = password;
             UserBalance = 100000;
-            _basket = new List<ShopItem>();
-            _purchaseHistory = new List<ShopItem>();
+            Cart = new List<ShopItem>();
+            PurchaseHistory = new List<ShopItem>();
         }
         
         public bool SignIn(string userName, string password)
@@ -48,32 +48,40 @@ namespace InternetShop.Users
         {
             Shop = shop;
         }
-        public abstract ShopItem SearchShopItem(string itemName);
+        public ShopItem GetShopItem(string itemName)
+        {            
+            return Shop.GetShopItem(itemName);
+        }
 
-        public void AddShopItemToBasket(string itemName)
+        public List<ShopItem> GetShopItems(string keyWord)
         {
-            ShopItem item = Shop.GetShopItem(itemName);
+            return Shop.GetShopItems(keyWord);
+        }
+
+        public void AddShopItemToCart(string itemName)
+        {
+            ShopItem item = GetShopItem(itemName);
             if(item != null)
             {
-                _basket.Add(item);
+                Cart.Add(item);
                 // Successful add to basket message
             }
         }
 
-        public void BuyItemsFromBasket()
+        public void BuyItemsFromCart()
         {
-            for(var i = 0; i < _basket.Count; i++)
+            for(var i = 0; i < Cart.Count; i++)
             {
-                ShopItem basketItem = _basket[i];
-                if (Shop.GetShopItem(basketItem.ItemName) != null)
+                ShopItem basketItem = Cart[i];
+                if (GetShopItem(basketItem.ItemName) != null)
                 {
                     if (basketItem.ItemPrice <= UserBalance)
                     {
                         Shop.BuyShopItem(basketItem.ItemName);
                         UserBalance -= basketItem.ItemPrice;
-                        _purchaseHistory.Add(basketItem);
+                        PurchaseHistory.Add(basketItem);
                         // Successful buy message
-                        _basket.Remove(basketItem);
+                        Cart.Remove(basketItem);
                         i--;
                     }
                     else

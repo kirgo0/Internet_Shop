@@ -40,9 +40,12 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Data\InfoPrinter.cs" />
+        <Compile Include="Data\ItemList.cs" />
         <Compile Include="Data\UserList.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="ShopController.cs" />
         <Compile Include="Shop\IShop.cs" />
         <Compile Include="Shop\OnlineShop.cs" />
         <Compile Include="Shop\ShopItem.cs" />

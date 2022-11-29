@@ -17,11 +17,6 @@ namespace InternetShop.Users
         {
             Shop.DeleteShopItem(itemName);
         }
-
-        public override ShopItem SearchShopItem(string itemName)
-        {
-            Console.WriteLine(Shop.GetShopItem(itemName) != null ? "Item Founded" : "Item not founded");
-            return Shop.GetShopItem(itemName);
-        }
+        
     }
 }
