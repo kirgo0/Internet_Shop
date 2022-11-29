@@ -205,6 +205,7 @@ namespace InternetShop
                 if (_shop.GetShopItem(msg) != null)
                 {
                     ProductMenu(_shop.GetShopItem(msg));
+                    isFinished = true;
                 }
                 else
                 {
@@ -287,7 +288,8 @@ namespace InternetShop
                         if (i == currentPage) bottomMenu += "(" + (i + 1) + ") ";
                         else bottomMenu += (i + 1) + " ";
                     }
-                    if(pagesCount > rightBorder) bottomMenu += "...";
+                    if(pagesCount > rightBorder+1) bottomMenu += "... " + pagesCount;
+                    else if (pagesCount > rightBorder) bottomMenu += pagesCount;
                     PrintProductList(currentPageItems);
                     InfoPrinter.PrintOneRow(bottomMenu);
                 }
@@ -405,19 +407,35 @@ namespace InternetShop
                         i++;
                     }
                 }
-                InfoPrinter.PrintOneRow("1. Add item to a cart");
-                InfoPrinter.PrintOneRow("2. Buy item");
-                InfoPrinter.PrintOneRow("3. You want to come back? (Y)");
-                var msg = Console.ReadLine();
-                if (msg.ToLower() == "y")
+                InfoPrinter.PrintOneRow("");
+                if (_user != null)
                 {
-                    isFinished = true;
-                    continue;
+                    InfoPrinter.PrintOneRow("1. Add item to a cart");
+                    InfoPrinter.PrintOneRow("2. Buy item");
+                    InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                    var msg = Console.ReadLine();
+                    if (msg.ToLower() == "y")
+                    { 
+                        isFinished = true;
+                        continue;
+                    }
+                    if (msg == "1")
+                    {
+                        var result = _user.AddShopItemToCart(item.ItemName);
+                        if (result)
+                        {
+                            PrintMessage(item.ItemName + " successfully added to your cart!");
+                        }
+                    }
                 }
-
-                if (msg == "1")
+                else
                 {
-                    _user.BuyItem(item);
+                    InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                    var msg = Console.ReadLine();
+                    if (msg.ToLower() == "y")
+                    { 
+                        isFinished = true;
+                    }
                 }
             } while (!isFinished);
         }

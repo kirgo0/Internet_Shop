@@ -58,7 +58,7 @@ namespace InternetShop.Users
             return Shop.GetShopItems(keyWord);
         }
 
-        public void AddShopItemToCart(string itemName)
+        public bool AddShopItemToCart(string itemName)
         {
             ShopItem item = GetShopItem(itemName);
             if(item != null)
@@ -66,6 +66,7 @@ namespace InternetShop.Users
                 Cart.Add(item);
                 // Successful add to basket message
             }
+            return true;
         }
 
         public void BuyItemsFromCart()
@@ -92,9 +93,15 @@ namespace InternetShop.Users
             }
         }
 
-        public void BuyItem(ShopItem item)
+        public void BuyItem(string itemName)
         {
-            
+            if (GetShopItem(itemName) != null)
+            {
+                ShopItem item = GetShopItem(itemName);
+                Shop.BuyShopItem(item.ItemName);
+                UserBalance -= item.ItemPrice;
+                PurchaseHistory.Add(item);
+            }
         }
     }
 }
