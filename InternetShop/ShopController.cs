@@ -140,7 +140,7 @@ namespace InternetShop
                 {
                     case "1":
                     {
-                        PrintProductList();
+                        ProductListMenu(_shop.ProductList,"Shop product list");
                         break;
                     }
                     case "2":
@@ -161,12 +161,12 @@ namespace InternetShop
                 {
                     case "1":
                     {
-                        PrintMessage("Balance: " + _user.UserBalance + " UAH");
+                        BalanceMenu();
                         break;
                     }
                     case "2":
                     {
-                        PrintUserCart();
+                        UserCartMenu();
                         break;
                     }
                     case "3":
@@ -176,7 +176,7 @@ namespace InternetShop
                     }
                     case "4":
                     {
-                        PrintProductList();
+                        ProductListMenu(_shop.ProductList, "Shop product list");
                         break;
                     }
                     case "5":
@@ -196,34 +196,122 @@ namespace InternetShop
 
         private void FindProduct()
         {
+            List<ShopItem> findResult = new List<ShopItem>();
+            bool isFinished = false;
             do
             {            
                 PrintMessage("Print product name");
                 var msg = Console.ReadLine();
                 if (_shop.GetShopItem(msg) != null)
                 {
-                    PrintProductInfo(_shop.GetShopItem(msg));
+                    ProductMenu(_shop.GetShopItem(msg));
                 }
                 else
                 {
-                    var itemNameKeyWord = msg.Split(' ');
-                    string keyWord = "";
-                    for (int i = 0; i <= itemNameKeyWord.Length-1; i++)
-                    {
-                        if (i > 0) keyWord += " ";
-                        keyWord += itemNameKeyWord[i];
-                        var findResult = _shop.GetShopItems(keyWord);
-                        if (findResult == null) continue;
-                        PrintMessage("Find products by a key word " + '"' + keyWord + '"');
-                        foreach (var item in findResult)
-                        {
-                            InfoPrinter.PrintOneRow(item.ItemName + " Price: " + item.ItemPrice);
-                        }
-                    }
+                    findResult = _shop.GetShopItems(msg.Split(' ')[0]);
+                    if (findResult == null) continue;
+                    ProductListMenu(findResult, "Find products by a key word " + '"' + msg.Split(' ')[0] + '"');
+                    isFinished = true;
                 }
-            } while (!LeaveQuestion());
+            } while (!isFinished);
         }
 
+        private void BalanceMenu()
+        {
+            bool isFinished = false;
+            do
+            {
+                PrintMessage("Balance: " + _user.UserBalance + " UAH");
+                InfoPrinter.PrintOneRow("1. Replenish the balance");
+                InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                var msg = Console.ReadLine();
+                if (msg.ToLower() == "y")
+                {
+                    isFinished = true;
+                    continue;
+                }
+                if (msg == "1")
+                {
+                    msg = GetAnswer("Enter the amount you want to recharge");
+                    try
+                    {
+                        Int32.Parse(msg);
+                    }
+                    catch (Exception e)
+                    {
+                        continue;
+                    }
+                    _user.UserBalance = Int32.Parse(msg);
+                }
+            } while (!isFinished);
+        }
+
+        private void ProductListMenu(List<ShopItem> list, string message)
+        {
+            bool isFinished = false;
+            var pagesCount = list.Count / 6 + 1;
+            var currentPage = 0;
+            do
+            {                    
+                PrintMessage(message);
+                if (pagesCount <= 1)
+                {
+                    PrintProductList(list);
+                } else
+                {
+                    List<ShopItem> currentPageItems = new List<ShopItem>();
+                    for (int i = currentPage*6; i < currentPage*6+6; i++)
+                    {
+                        try
+                        {
+                            currentPageItems.Add(list[i]);
+                        }
+                        catch (ArgumentOutOfRangeException e)
+                        {
+                            continue;
+                            throw;
+                        }
+                    }
+                    var bottomMenu = "Pages: ";
+                    int leftBorder = currentPage, rightBorder = currentPage;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (leftBorder >= 0) leftBorder--;
+                        else rightBorder++;
+                        if (rightBorder < pagesCount) rightBorder++;
+                        else leftBorder--;
+                    }
+                    if(leftBorder > 0) bottomMenu += "... ";
+                    for (int i = leftBorder+1; i < rightBorder; i++)
+                    {
+                        if (i == currentPage) bottomMenu += "(" + (i + 1) + ") ";
+                        else bottomMenu += (i + 1) + " ";
+                    }
+                    if(pagesCount > rightBorder) bottomMenu += "...";
+                    PrintProductList(currentPageItems);
+                    InfoPrinter.PrintOneRow(bottomMenu);
+                }
+                InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                var msg = Console.ReadLine();
+                if (msg.ToLower() == "y")
+                {
+                    isFinished = true;
+                    continue;
+                }
+                try
+                {
+                    Int32.Parse(msg);
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+                var number = Int32.Parse(msg) - 1;
+                if (number >= 0 && number < pagesCount)
+                    currentPage = number;
+            } while (!isFinished);
+        }
+        
         private string GetAnswer(string question)
         {
             PrintMessage(question);
@@ -270,7 +358,7 @@ namespace InternetShop
             InfoPrinter.PrintOneRow("3. Sign out");
         }
 
-        private void PrintUserCart()
+        private void UserCartMenu()
         {
             do
             {
@@ -289,6 +377,51 @@ namespace InternetShop
             } while(!LeaveQuestion());
         }
 
+        private void ProductMenu(ShopItem shopItem)
+        {
+            bool isFinished = false;
+            do
+            {
+                var item = (ShopItemExtended) shopItem;
+                PrintMessage(item.ItemName);
+                InfoPrinter.PrintPriceRow(item.ItemPrice);
+                InfoPrinter.PrintRow("Description");
+                InfoPrinter.PrintRow("");
+                var i = 0;
+                var description = item.ItemDescription.Split(' ');
+                var line = "";
+                foreach (var word in description)
+                {
+                    i += word.Length;
+                    if (i > InfoPrinter.TableWidth - InfoPrinter.TableWidth / 4)
+                    {
+                        i = 0;
+                        InfoPrinter.PrintRow(line);
+                        line = "";
+                    }
+                    else
+                    {
+                        line += word + " ";
+                        i++;
+                    }
+                }
+                InfoPrinter.PrintOneRow("1. Add item to a cart");
+                InfoPrinter.PrintOneRow("2. Buy item");
+                InfoPrinter.PrintOneRow("3. You want to come back? (Y)");
+                var msg = Console.ReadLine();
+                if (msg.ToLower() == "y")
+                {
+                    isFinished = true;
+                    continue;
+                }
+
+                if (msg == "1")
+                {
+                    _user.BuyItem(item);
+                }
+            } while (!isFinished);
+        }
+        
         private void PrintUserPurchase()
         {
             do
@@ -308,21 +441,17 @@ namespace InternetShop
             } while(!LeaveQuestion());
         }
 
-        private void PrintProductList()
+        private void PrintProductList(List<ShopItem> list)
         {
-            var productList = _shop.ProductList;
-            Thread.Sleep(1000);
-            var count = productList.Count;
-            if (count < 3) return;
-            Console.Clear();
+            var count = list.Count;
+            if (count == 0) return;
             for (var i = 0; i < count; i+= 3)
             {
-                InfoPrinter.PrintLine();
                 if (count - i >= 3)
                 {
                     InfoPrinter.PrintOneRow("#" + (i+1),"#" + (i+2),"#" + (i+3));
-                    InfoPrinter.PrintOneRow(productList[i].ItemName, productList[i+1].ItemName, productList[i+2].ItemName);
-                    InfoPrinter.PrintPriceRow(productList[i].ItemPrice, productList[i+1].ItemPrice, productList[i+2].ItemPrice);
+                    InfoPrinter.PrintOneRow(list[i].ItemName, list[i+1].ItemName, list[i+2].ItemName);
+                    InfoPrinter.PrintPriceRow(list[i].ItemPrice, list[i+1].ItemPrice, list[i+2].ItemPrice);
                 }
                 else
                 {
@@ -331,16 +460,16 @@ namespace InternetShop
                     if(count - i == 2)
                     {
                         itemNames = new string[]
-                            { productList[i].ItemName, productList[i + 1].ItemName, "" };
+                            { list[i].ItemName, list[i + 1].ItemName, "" };
                         itemPrices = new[]
-                            { productList[i].ItemPrice, productList[i + 1].ItemPrice, 0 };
+                            { list[i].ItemPrice, list[i + 1].ItemPrice, 0 };
                     }
                     else
                     {
                         itemNames = new[]
-                            { productList[i].ItemName, "", "" };
+                            { list[i].ItemName, "", "" };
                         itemPrices= new[]
-                            { productList[i].ItemPrice, 0, 0 };
+                            { list[i].ItemPrice, 0, 0 };
                     }
                     InfoPrinter.PrintOneRow(i+1 <= count ? "#" + (i+1): "",
                         i+2 <= count ? "#" + (i+2): "",
@@ -351,33 +480,5 @@ namespace InternetShop
             }
         }
         
-        private void PrintProductInfo(ShopItem shopItem)
-        {
-            var item = (ShopItemExtended) shopItem;
-            PrintMessage(item.ItemName);
-            InfoPrinter.PrintPriceRow(item.ItemPrice);
-            InfoPrinter.PrintRow("Description");
-            InfoPrinter.PrintRow("");
-            var i = 0;
-            var description = item.ItemDescription.Split(' ');
-            var line = "";
-            foreach (var word in description)
-            {
-                i += word.Length;
-                if (i > InfoPrinter.TableWidth - InfoPrinter.TableWidth/4)
-                {
-                    i = 0;
-                    InfoPrinter.PrintRow(line);
-                    line = "";
-                }
-                else
-                {
-                    line += word + " ";
-                    i++;
-                }           
-            }
-            InfoPrinter.PrintRow("");
-            InfoPrinter.PrintLine();
-        }
     }
 }

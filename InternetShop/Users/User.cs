@@ -91,5 +91,10 @@ namespace InternetShop.Users
                 }
             }
         }
+
+        public void BuyItem(ShopItem item)
+        {
+            
+        }
     }
 }
