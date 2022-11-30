@@ -8,7 +8,7 @@ namespace InternetShop.Data
     public static class InfoPrinter
     {
 
-        public const int TableWidth = 203;
+        public const int TableWidth = 150;
 
         public static void PrintLine()
         {

@@ -97,7 +97,7 @@ namespace InternetShop
                 PrintMessage("Written passwords are not same");
                 if (LeaveQuestion())
                 {
-                    PrintMessage("Sign Up form canceled!");
+                    PrintMessage("Sign Up form are canceled!");
                     _signedIn = false;
                     return null;
                 }
@@ -117,14 +117,14 @@ namespace InternetShop
                     PrintMessage("Username or password is wrong");
                     if (LeaveQuestion())
                     {
-                        PrintMessage("Sign Ip form canceled!");
+                        PrintMessage("Sign In form are canceled!");
                         return null;
                     }
                 }
                 else
                 {
                     var user = _shop.SignIn(userName,password);
-                    PrintMessage(user.UserName +  " You successfully Signed In!");
+                    PrintMessage(user.UserName +  " You are successfully Signed In!");
                     _signedIn = true;
                     return user;
                 }
@@ -224,7 +224,7 @@ namespace InternetShop
             {
                 PrintMessage("Balance: " + _user.UserBalance + " UAH");
                 InfoPrinter.PrintOneRow("1. Replenish the balance");
-                InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                 var msg = Console.ReadLine();
                 if (msg.ToLower() == "y")
                 {
@@ -255,12 +255,12 @@ namespace InternetShop
             do
             {                    
                 PrintMessage(message);
+                List<ShopItem> currentPageItems = new List<ShopItem>();
                 if (pagesCount <= 1)
                 {
                     PrintProductList(list);
                 } else
                 {
-                    List<ShopItem> currentPageItems = new List<ShopItem>();
                     for (int i = currentPage*6; i < currentPage*6+6; i++)
                     {
                         try
@@ -293,12 +293,37 @@ namespace InternetShop
                     PrintProductList(currentPageItems);
                     InfoPrinter.PrintOneRow(bottomMenu);
                 }
-                InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                InfoPrinter.PrintOneRow("Type #(number of product) for exact product information");
+                InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                 var msg = Console.ReadLine();
                 if (msg.ToLower() == "y")
                 {
                     isFinished = true;
                     continue;
+                }
+                if (msg.StartsWith("#") && msg.Length == 2)
+                {
+                    var productNumber = msg.Remove(0, 1);
+                    try
+                    {
+                        Int32.Parse(productNumber);
+                    }
+                    catch (FormatException e)
+                    {
+                        continue;
+                        throw;
+                    }
+                    if (Int32.Parse(productNumber) - 1 >= 0 && Int32.Parse(productNumber) - 1 < 6)
+                    {
+                        try
+                        {
+                            ProductMenu(currentPageItems[Int32.Parse(productNumber) - 1]);
+                        }
+                        catch (ArgumentOutOfRangeException e)
+                        {
+                            continue;
+                        }
+                    }
                 }
                 try
                 {
@@ -323,7 +348,7 @@ namespace InternetShop
         private bool LeaveQuestion()
         {
             Thread.Sleep(500);
-            InfoPrinter.PrintOneRow("You want to come back (Y) or try again? (Any key)");
+            InfoPrinter.PrintOneRow("Do You want to come back (Y) or try again? (Any key)");
             var msg = Console.ReadLine().ToLower();
             return msg == "y";
         }
@@ -410,9 +435,9 @@ namespace InternetShop
                 InfoPrinter.PrintOneRow("");
                 if (_user != null)
                 {
-                    InfoPrinter.PrintOneRow("1. Add item to a cart");
-                    InfoPrinter.PrintOneRow("2. Buy item");
-                    InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                    InfoPrinter.PrintOneRow("1. Add an item to a cart");
+                    InfoPrinter.PrintOneRow("2. Buy an item");
+                    InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                     var msg = Console.ReadLine();
                     if (msg.ToLower() == "y")
                     { 
@@ -421,16 +446,34 @@ namespace InternetShop
                     }
                     if (msg == "1")
                     {
-                        var result = _user.AddShopItemToCart(item.ItemName);
-                        if (result)
+                        if ( _user.AddShopItemToCart(item.ItemName))
                         {
-                            PrintMessage(item.ItemName + " successfully added to your cart!");
+                            PrintMessage(item.ItemName + " was successfully added to your cart!");
+                        }
+                        else
+                        {
+                            PrintMessage("Unexpected error, form closed");
+                        }
+                    } else if (msg == "2")
+                    {
+                        if (_user.UserBalance >= item.ItemPrice)
+                        {
+                            if (GetAnswer("You sure you want to buy a " + item.ItemName + "? (Y) to confirm").ToLower() == "y")
+                            {
+                                if(_user.BuyItem(item.ItemName)) PrintMessage("You successfully buy a " + item.ItemName);
+                                else PrintMessage("Unexpected error, form closed");
+                            }
+                        }
+                        else
+                        {
+                            PrintMessage("You don't have enough money on your balance to make a purchase");
+                            Thread.Sleep(1500);
                         }
                     }
                 }
                 else
                 {
-                    InfoPrinter.PrintOneRow("You want to come back? (Y)");
+                    InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                     var msg = Console.ReadLine();
                     if (msg.ToLower() == "y")
                     { 
