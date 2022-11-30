@@ -58,6 +58,18 @@ namespace InternetShop.Users
             return Shop.GetShopItems(keyWord);
         }
 
+        public bool RemoveShopItemFromCart(int pos)
+        {
+            try
+            {
+                Cart.RemoveAt(pos);
+                return true;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return false;
+            }
+        }
         public bool AddShopItemToCart(string itemName)
         {
             ShopItem item = GetShopItem(itemName);
@@ -69,28 +81,29 @@ namespace InternetShop.Users
             return true;
         }
 
-        public void BuyItemsFromCart()
+        public bool BuyItemsFromCart()
         {
+            foreach (var item in Cart)
+            {
+                if (item.ItemPrice > UserBalance)
+                {
+                    return false;
+                }
+            }
             for(var i = 0; i < Cart.Count; i++)
             {
                 ShopItem basketItem = Cart[i];
                 if (GetShopItem(basketItem.ItemName) != null)
                 {
-                    if (basketItem.ItemPrice <= UserBalance)
-                    {
-                        Shop.BuyShopItem(basketItem.ItemName);
-                        UserBalance = -basketItem.ItemPrice;
-                        PurchaseHistory.Add(basketItem);
-                        // Successful buy message
-                        Cart.Remove(basketItem);
-                        i--;
-                    }
-                    else
-                    {
-                        // No balance message
-                    }
+                    Shop.BuyShopItem(basketItem.ItemName);
+                    UserBalance = -basketItem.ItemPrice;
+                    PurchaseHistory.Add(basketItem);
+                    // Successful buy message
+                    Cart.Remove(basketItem);
+                    i--;
                 }
-            }
+            }                    
+            return true;
         }
 
         public bool BuyItem(string itemName)

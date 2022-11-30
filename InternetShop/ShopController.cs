@@ -259,6 +259,7 @@ namespace InternetShop
                 if (pagesCount <= 1)
                 {
                     PrintProductList(list);
+                    currentPageItems = list;
                 } else
                 {
                     for (int i = currentPage*6; i < currentPage*6+6; i++)
@@ -321,6 +322,7 @@ namespace InternetShop
                         }
                         catch (ArgumentOutOfRangeException e)
                         {
+                            Console.WriteLine("out of range");
                             continue;
                         }
                     }
@@ -353,9 +355,21 @@ namespace InternetShop
             return msg == "y";
         }
 
+        private void PrintMessage(string message, int delay)
+        {
+            if (delay < 0)
+            {
+                PrintMessage(message);
+                return;
+            }
+            Console.Clear();
+            InfoPrinter.PrintLine();
+            InfoPrinter.PrintOneRow(message);
+            Thread.Sleep(delay);
+        }
+        
         private void PrintMessage(string message)
         {
-            Thread.Sleep(500);
             Console.Clear();
             InfoPrinter.PrintLine();
             InfoPrinter.PrintOneRow(message);
@@ -387,6 +401,7 @@ namespace InternetShop
 
         private void UserCartMenu()
         {
+            bool isFinished = false;
             do
             {
                 PrintMessage("Your cart");
@@ -396,12 +411,79 @@ namespace InternetShop
                     {
                         InfoPrinter.PrintOneRow("Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
                     }
+                    InfoPrinter.PrintOneRow("1. Buy all items in the cart");
+                    InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
+                    var msg = Console.ReadLine();
+                    if (msg.ToLower() == "y")
+                    {
+                        isFinished = true;
+                        continue;
+                    }
+                    if (msg == "1")
+                    {
+                        if (_user.BuyItemsFromCart())
+                        {
+                            PrintMessage("All items were successfully purchased",1500);
+                        }
+                        else
+                        {
+                            PrintMessage("You don't have enough money on your balance to buy all the items in the cart");
+                            InfoPrinter.PrintOneRow("Your balance: " + _user.UserBalance + " UAH");
+                            for (var i = 0; i < _user.Cart.Count; i++)
+                            {
+                                var item = _user.Cart[i];
+                                InfoPrinter.PrintOneRow("#" + (i + 1) + " Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
+                            }
+                            InfoPrinter.PrintOneRow("Type #(number) to remove an item from the cart");
+                            InfoPrinter.PrintOneRow("1. Replenish balance");
+                            InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                            msg = Console.ReadLine();
+                            if (msg.ToLower() == "y")
+                            {
+                                isFinished = true;
+                                continue;
+                            }
+                            if (msg == "1")
+                            {
+                                BalanceMenu();
+                                continue;
+                            }
+                            if (msg.StartsWith("#"))
+                            {
+                                var listNumber = msg.Remove(0, 1);
+                                try
+                                {
+                                    Int32.Parse(listNumber);
+                                }
+                                catch (FormatException e)
+                                {
+                                    continue;
+                                }
+                                var number = Int32.Parse(listNumber);
+                                if (_user.RemoveShopItemFromCart(number-1))
+                                {
+                                    PrintMessage("This item was removed from your cart",1500);
+                                }
+                                else
+                                {
+                                    PrintMessage("You entered a wrong cart item number",1000);
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     InfoPrinter.PrintOneRow("Your cart as empty");
+                    InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
+                    var msg = Console.ReadLine();
+                    if (msg.ToLower() == "y")
+                    {
+                        isFinished = true;
+                        continue;
+                    }
                 }
-            } while(!LeaveQuestion());
+            } while(!isFinished);
         }
 
         private void ProductMenu(ShopItem shopItem)
@@ -488,7 +570,7 @@ namespace InternetShop
             do
             {
                 PrintMessage("Your purchase history");
-                if (_user.Cart.Count != 0)
+                if (_user.PurchaseHistory.Count != 0)
                 {
                     foreach (var item in _user.PurchaseHistory)
                     {
