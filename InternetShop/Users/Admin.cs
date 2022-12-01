@@ -8,14 +8,14 @@ namespace InternetShop.Users
         public Admin(string userName, string password) : base(userName, password, AccountType.Admin)
         {
         }
-        public void CreateNewItem(string itemName, double itemPrice, string itemDescription)
+        public bool CreateNewItem(string itemName, double itemPrice, string itemDescription)
         {
-            Shop.CreateNewShopItem(itemName,itemPrice,itemDescription);
+            return Shop.CreateNewShopItem(itemName,itemPrice,itemDescription);
         }
 
-        public void DeleteItem(string itemName)
+        public bool RemoveItem(string itemName)
         {
-            Shop.DeleteShopItem(itemName);
+            return Shop.DeleteShopItem(itemName);
         }
         
     }

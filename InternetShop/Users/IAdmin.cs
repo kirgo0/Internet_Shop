@@ -4,7 +4,7 @@ namespace InternetShop.Users
 {
     public interface IAdmin
     {        
-        void CreateNewItem (string itemName, double itemPrice, string itemDescription);
-        void DeleteItem (string itemName);
+        bool CreateNewItem (string itemName, double itemPrice, string itemDescription);
+        bool RemoveItem (string itemName);
     }
 }

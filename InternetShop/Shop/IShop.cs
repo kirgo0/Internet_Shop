@@ -5,8 +5,8 @@ namespace InternetShop.Shop
 {
     public interface IShop
     {
-        void CreateNewShopItem(string itemName, double itemPrice, string itemDescription);
-        void DeleteShopItem(string itemName);
+        bool CreateNewShopItem(string itemName, double itemPrice, string itemDescription);
+        bool DeleteShopItem(string itemName);
         ShopItem GetShopItem(string itemName);
 
         List<ShopItem> GetShopItems(string keyword);
