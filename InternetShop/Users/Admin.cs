@@ -5,7 +5,7 @@ namespace InternetShop.Users
 {
     public class Admin : User , IAdmin
     {
-        public Admin(string userName, string password) : base(userName, password)
+        public Admin(string userName, string password) : base(userName, password, AccountType.Admin)
         {
         }
         public void CreateNewItem(string itemName, double itemPrice, string itemDescription)

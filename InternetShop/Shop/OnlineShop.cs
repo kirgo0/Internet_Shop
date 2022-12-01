@@ -60,13 +60,13 @@ namespace InternetShop.Shop
             
         }
 
-        private Admin SignUpAdmin(string userName, string password, string passwordRepeat)
+        public User SignUpAdmin(string userName, string password, string passwordRepeat)
         {
-            if (GetUser(userName) != null) return null; 
+            if (GetUser(userName) != null) return null;
             if (password != passwordRepeat) return null;
-            var newUser = new Admin(userName, password);
+            User newUser = new Admin(userName, password);
             _users.Add(newUser);
-            newUser.GetShop(this);
+            newUser.GetShop(this);     
             return newUser;
         }
         public User SignUp(string userName, string password, string passwordRepeat)

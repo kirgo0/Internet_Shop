@@ -10,7 +10,9 @@ namespace InternetShop.Users
         protected IShop Shop { get; set; }
         public string UserName { get; set; }
         private string Password { get; set; }
-        private double _balance; 
+        private double _balance;
+
+        public AccountType CheckAccountType { get; }
 
         public double UserBalance
         {
@@ -20,7 +22,7 @@ namespace InternetShop.Users
         public readonly List<ShopItem> Cart;
         public readonly List<ShopItem> PurchaseHistory;
 
-        protected User(List<ShopItem> basket, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, double userBalance)
+        protected User(List<ShopItem> basket, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, double userBalance, AccountType checkAccountType)
         {
             Cart = basket;
             PurchaseHistory = purchaseHistory;
@@ -28,12 +30,14 @@ namespace InternetShop.Users
             UserName = userName;
             Password = password;
             UserBalance = userBalance;
+            CheckAccountType = checkAccountType;
         }
 
-        protected User(string userName, string password)
+        protected User(string userName, string password, AccountType checkAccountType)
         {
             UserName = userName;
             Password = password;
+            CheckAccountType = checkAccountType;
             UserBalance = 100000;
             Cart = new List<ShopItem>();
             PurchaseHistory = new List<ShopItem>();
@@ -83,13 +87,13 @@ namespace InternetShop.Users
 
         public bool BuyItemsFromCart()
         {
+            double sum = 0;
             foreach (var item in Cart)
             {
-                if (item.ItemPrice > UserBalance)
-                {
-                    return false;
-                }
+                sum += item.ItemPrice;
             }
+
+            if (sum > UserBalance) return false;
             for(var i = 0; i < Cart.Count; i++)
             {
                 ShopItem basketItem = Cart[i];
@@ -111,6 +115,7 @@ namespace InternetShop.Users
             if (GetShopItem(itemName) != null)
             {
                 ShopItem item = GetShopItem(itemName);
+                if (item.ItemPrice > UserBalance) return false;
                 Shop.BuyShopItem(item.ItemName);
                 UserBalance = -item.ItemPrice;
                 PurchaseHistory.Add(item);

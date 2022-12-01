@@ -14,6 +14,8 @@ namespace InternetShop
         private ItemList _items;
         private User _user;
         private bool _signedIn = false;
+        private bool _adminMode = false;
+        private IAdmin _admin;
         public ShopController(OnlineShop shop)
         {
             _shop = shop;
@@ -36,13 +38,21 @@ namespace InternetShop
                     StartMessageHandler(message);
                     while (_signedIn)
                     {
+                        if (_adminMode)
+                        {
+                            PrintAdminMenu();
+                            message = Console.ReadLine();
+                            if(message == "Exit") return;
+                            AdminMessageHandler(message);
+                            continue;
+                        }
                         if (_user == null)
                         {
                             PrintGuestMenu();
                         }
-                        else
+                        else 
                         {
-                            PrintShopMenu();
+                            PrintDefaultMenu();
                         }
                         message = Console.ReadLine();
                         if(message == "Exit") return;
@@ -86,18 +96,18 @@ namespace InternetShop
                 {
                     if (_shop.SignUp(userName, password1, password2) == null)
                     {
-                        PrintMessage("This username are used already");
+                        PrintMessage("This username are used already",1500);
                         continue;
                     }
                     var user = _shop.SignIn(userName,password1);
-                    PrintMessage(user.UserName +  " You successfully Signed Up!");
+                    PrintMessage(user.UserName +  " You successfully Signed Up!",1500);
                     _signedIn = true;
                     return user;
                 }
-                PrintMessage("Written passwords are not same");
+                PrintMessage("Written passwords are not same",1500);
                 if (LeaveQuestion())
                 {
-                    PrintMessage("Sign Up form are canceled!");
+                    PrintMessage("Sign Up form are canceled!",1500);
                     _signedIn = false;
                     return null;
                 }
@@ -114,17 +124,28 @@ namespace InternetShop
                 password = GetAnswer("Write your password");
                 if (_shop.SignIn(userName, password) == null)
                 {
-                    PrintMessage("Username or password is wrong");
+                    PrintMessage("Username or password is wrong",1500);
                     if (LeaveQuestion())
                     {
-                        PrintMessage("Sign In form are canceled!");
+                        PrintMessage("Sign In form are canceled!",1500);
                         return null;
                     }
                 }
                 else
                 {
                     var user = _shop.SignIn(userName,password);
-                    PrintMessage(user.UserName +  " You are successfully Signed In!");
+                    if (user.CheckAccountType == AccountType.Admin)
+                    {
+                        _adminMode = true;
+                        _admin = (IAdmin) user;
+                        PrintMessage("Admin " + user.UserName +  " You are successfully Signed In!",1500);
+                    }
+                    else
+                    {
+                        _adminMode = false;
+                        _admin = null;
+                        PrintMessage(user.UserName +  " You are successfully Signed In!",1500);
+                    }
                     _signedIn = true;
                     return user;
                 }
@@ -194,9 +215,56 @@ namespace InternetShop
             }
         }
 
+        private void AdminMessageHandler(string message)
+        {
+            if (_adminMode)
+            {
+                switch (message)
+                {
+                    case "1":
+                    {
+                        BalanceMenu();
+                        break;
+                    }
+                    case "2":
+                    {
+                        UserCartMenu();
+                        break;
+                    }
+                    case "3":
+                    {
+                        PrintUserPurchase();
+                        break;
+                    }
+                    case "4":
+                    {
+                        ProductListMenu(_shop.ProductList, "Shop product list");
+                        break;
+                    }
+                    case "5":
+                    {
+                        FindProduct();
+                        break;
+                    }
+                    case "6":
+                    {
+                        _user = null;
+                        _signedIn = false;
+                        break;
+                    }
+                    case "7":
+                    {
+                        _user = null;
+                        _adminMode = false;
+                        _admin = null;
+                        _signedIn = false;
+                        break;
+                    }
+                }
+            }
+        }
         private void FindProduct()
         {
-            List<ShopItem> findResult = new List<ShopItem>();
             bool isFinished = false;
             do
             {            
@@ -209,9 +277,14 @@ namespace InternetShop
                 }
                 else
                 {
-                    findResult = _shop.GetShopItems(msg.Split(' ')[0]);
-                    if (findResult == null) continue;
-                    ProductListMenu(findResult, "Find products by a key word " + '"' + msg.Split(' ')[0] + '"');
+                    var findResult = _shop.GetShopItems(msg.Split(' ')[0]);
+                    if (findResult.Count == 0)
+                    {
+                        PrintMessage("Failed to find products by the " + '"' + msg + '"' + " keyword" , 1500);
+                        isFinished = true;
+                        continue;
+                    }
+                    ProductListMenu(findResult, "Find products by a key word " + '"' + msg + '"');
                     isFinished = true;
                 }
             } while (!isFinished);
@@ -250,7 +323,7 @@ namespace InternetShop
         private void ProductListMenu(List<ShopItem> list, string message)
         {
             bool isFinished = false;
-            var pagesCount = list.Count / 6 + 1;
+            var pagesCount = list.Count % 6 == 0 ? list.Count / 6 : list.Count / 6 + 1;
             var currentPage = 0;
             do
             {                    
@@ -279,11 +352,11 @@ namespace InternetShop
                     for (int i = 0; i < 3; i++)
                     {
                         if (leftBorder >= 0) leftBorder--;
-                        else rightBorder++;
+                        else if (rightBorder < pagesCount) rightBorder++;
                         if (rightBorder < pagesCount) rightBorder++;
-                        else leftBorder--;
+                        else if (leftBorder >= 0) leftBorder--;
                     }
-                    if(leftBorder > 0) bottomMenu += "... ";
+                    if(leftBorder >= 0) bottomMenu += "... ";
                     for (int i = leftBorder+1; i < rightBorder; i++)
                     {
                         if (i == currentPage) bottomMenu += "(" + (i + 1) + ") ";
@@ -349,7 +422,6 @@ namespace InternetShop
         
         private bool LeaveQuestion()
         {
-            Thread.Sleep(500);
             InfoPrinter.PrintOneRow("Do You want to come back (Y) or try again? (Any key)");
             var msg = Console.ReadLine().ToLower();
             return msg == "y";
@@ -382,7 +454,7 @@ namespace InternetShop
             InfoPrinter.PrintOneRow("3. Sign In as guest");
         }
 
-        private void PrintShopMenu()
+        private void PrintDefaultMenu()
         {
             PrintMessage("1. View Balance");
             InfoPrinter.PrintOneRow("2. View your cart");
@@ -399,6 +471,17 @@ namespace InternetShop
             InfoPrinter.PrintOneRow("3. Sign out");
         }
 
+        private void PrintAdminMenu()
+        {
+            PrintMessage("1. View shop balance");
+            InfoPrinter.PrintOneRow("2. View products");
+            InfoPrinter.PrintOneRow("3. Find a product");
+            InfoPrinter.PrintOneRow("4. Create a new product");
+            InfoPrinter.PrintOneRow("5. Change product");
+            InfoPrinter.PrintOneRow("6. Delete product");
+            InfoPrinter.PrintOneRow("7. Sign out");
+        }
+        
         private void UserCartMenu()
         {
             bool isFinished = false;
@@ -428,19 +511,20 @@ namespace InternetShop
                         else
                         {
                             PrintMessage("You don't have enough money on your balance to buy all the items in the cart");
-                            InfoPrinter.PrintOneRow("Your balance: " + _user.UserBalance + " UAH");
+                            InfoPrinter.PrintRow("");
+                            InfoPrinter.PrintOneRow("Your cart");
                             for (var i = 0; i < _user.Cart.Count; i++)
                             {
                                 var item = _user.Cart[i];
                                 InfoPrinter.PrintOneRow("#" + (i + 1) + " Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
                             }
+                            InfoPrinter.PrintRow("");
                             InfoPrinter.PrintOneRow("Type #(number) to remove an item from the cart");
                             InfoPrinter.PrintOneRow("1. Replenish balance");
                             InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                             msg = Console.ReadLine();
                             if (msg.ToLower() == "y")
                             {
-                                isFinished = true;
                                 continue;
                             }
                             if (msg == "1")
@@ -530,11 +614,11 @@ namespace InternetShop
                     {
                         if ( _user.AddShopItemToCart(item.ItemName))
                         {
-                            PrintMessage(item.ItemName + " was successfully added to your cart!");
+                            PrintMessage(item.ItemName + " was successfully added to your cart!",1500);
                         }
                         else
                         {
-                            PrintMessage("Unexpected error, form closed");
+                            PrintMessage("Unexpected error, form closed",1500);
                         }
                     } else if (msg == "2")
                     {
@@ -542,14 +626,13 @@ namespace InternetShop
                         {
                             if (GetAnswer("You sure you want to buy a " + item.ItemName + "? (Y) to confirm").ToLower() == "y")
                             {
-                                if(_user.BuyItem(item.ItemName)) PrintMessage("You successfully buy a " + item.ItemName);
-                                else PrintMessage("Unexpected error, form closed");
+                                if(_user.BuyItem(item.ItemName)) PrintMessage("You successfully buy a " + item.ItemName,1500);
+                                else PrintMessage("Unexpected error, form closed",1500);
                             }
                         }
                         else
                         {
-                            PrintMessage("You don't have enough money on your balance to make a purchase");
-                            Thread.Sleep(1500);
+                            PrintMessage("You don't have enough money on your balance to make a purchase",1500);
                         }
                     }
                 }
