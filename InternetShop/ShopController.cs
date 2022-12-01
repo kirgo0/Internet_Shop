@@ -223,33 +223,33 @@ namespace InternetShop
                 {
                     case "1":
                     {
-                        BalanceMenu();
+                        PrintShopBalance();
                         break;
                     }
                     case "2":
                     {
-                        UserCartMenu();
+                        ProductListMenu(_shop.ProductList, "Shop product list");
                         break;
                     }
                     case "3":
                     {
-                        PrintUserPurchase();
+                        FindProduct();
                         break;
                     }
                     case "4":
                     {
-                        ProductListMenu(_shop.ProductList, "Shop product list");
+                        // Create new product
+                        
                         break;
                     }
                     case "5":
                     {
-                        FindProduct();
+                        // Change product
                         break;
                     }
                     case "6":
                     {
-                        _user = null;
-                        _signedIn = false;
+                        // Delete product menu 
                         break;
                     }
                     case "7":
@@ -412,74 +412,6 @@ namespace InternetShop
                 if (number >= 0 && number < pagesCount)
                     currentPage = number;
             } while (!isFinished);
-        }
-        
-        private string GetAnswer(string question)
-        {
-            PrintMessage(question);
-            return Console.ReadLine();
-        }
-        
-        private bool LeaveQuestion()
-        {
-            InfoPrinter.PrintOneRow("Do You want to come back (Y) or try again? (Any key)");
-            var msg = Console.ReadLine().ToLower();
-            return msg == "y";
-        }
-
-        private void PrintMessage(string message, int delay)
-        {
-            if (delay < 0)
-            {
-                PrintMessage(message);
-                return;
-            }
-            Console.Clear();
-            InfoPrinter.PrintLine();
-            InfoPrinter.PrintOneRow(message);
-            Thread.Sleep(delay);
-        }
-        
-        private void PrintMessage(string message)
-        {
-            Console.Clear();
-            InfoPrinter.PrintLine();
-            InfoPrinter.PrintOneRow(message);
-        }
-
-        private void PrintStartMenu()
-        {
-            PrintMessage("1. Sign Up");
-            InfoPrinter.PrintOneRow("2. Sign In");
-            InfoPrinter.PrintOneRow("3. Sign In as guest");
-        }
-
-        private void PrintDefaultMenu()
-        {
-            PrintMessage("1. View Balance");
-            InfoPrinter.PrintOneRow("2. View your cart");
-            InfoPrinter.PrintOneRow("3. View your purchase history");
-            InfoPrinter.PrintOneRow("4. View products");
-            InfoPrinter.PrintOneRow("5. Find a product");
-            InfoPrinter.PrintOneRow("6. Sign out");
-        }
-        
-        private void PrintGuestMenu()
-        {
-            PrintMessage("1. View products");
-            InfoPrinter.PrintOneRow("2. Find a product");
-            InfoPrinter.PrintOneRow("3. Sign out");
-        }
-
-        private void PrintAdminMenu()
-        {
-            PrintMessage("1. View shop balance");
-            InfoPrinter.PrintOneRow("2. View products");
-            InfoPrinter.PrintOneRow("3. Find a product");
-            InfoPrinter.PrintOneRow("4. Create a new product");
-            InfoPrinter.PrintOneRow("5. Change product");
-            InfoPrinter.PrintOneRow("6. Delete product");
-            InfoPrinter.PrintOneRow("7. Sign out");
         }
         
         private void UserCartMenu()
@@ -647,7 +579,74 @@ namespace InternetShop
                 }
             } while (!isFinished);
         }
+        private string GetAnswer(string question)
+        {
+            PrintMessage(question);
+            return Console.ReadLine();
+        }
         
+        private bool LeaveQuestion()
+        {
+            InfoPrinter.PrintOneRow("Do You want to come back (Y) or try again? (Any key)");
+            var msg = Console.ReadLine().ToLower();
+            return msg == "y";
+        }
+
+        private void PrintMessage(string message, int delay)
+        {
+            if (delay < 0)
+            {
+                PrintMessage(message);
+                return;
+            }
+            Console.Clear();
+            InfoPrinter.PrintLine();
+            InfoPrinter.PrintOneRow(message);
+            Thread.Sleep(delay);
+        }
+        
+        private void PrintMessage(string message)
+        {
+            Console.Clear();
+            InfoPrinter.PrintLine();
+            InfoPrinter.PrintOneRow(message);
+        }
+
+        private void PrintStartMenu()
+        {
+            PrintMessage("1. Sign Up");
+            InfoPrinter.PrintOneRow("2. Sign In");
+            InfoPrinter.PrintOneRow("3. Sign In as guest");
+        }
+
+        private void PrintDefaultMenu()
+        {
+            PrintMessage("1. View Balance");
+            InfoPrinter.PrintOneRow("2. View your cart");
+            InfoPrinter.PrintOneRow("3. View your purchase history");
+            InfoPrinter.PrintOneRow("4. View products");
+            InfoPrinter.PrintOneRow("5. Find a product");
+            InfoPrinter.PrintOneRow("6. Sign out");
+        }
+        
+        private void PrintGuestMenu()
+        {
+            PrintMessage("1. View products");
+            InfoPrinter.PrintOneRow("2. Find a product");
+            InfoPrinter.PrintOneRow("3. Sign out");
+        }
+
+        private void PrintAdminMenu()
+        {
+            PrintMessage("1. View shop balance");
+            InfoPrinter.PrintOneRow("2. View products");
+            InfoPrinter.PrintOneRow("3. Find a product");
+            InfoPrinter.PrintOneRow("4. Create a new product");
+            InfoPrinter.PrintOneRow("5. Change product");
+            InfoPrinter.PrintOneRow("6. Delete product");
+            InfoPrinter.PrintOneRow("7. Sign out");
+        }
+
         private void PrintUserPurchase()
         {
             do
@@ -665,6 +664,15 @@ namespace InternetShop
                     InfoPrinter.PrintOneRow("You haven't bought anything yet(");
                 }
             } while(!LeaveQuestion());
+        }
+
+        private void PrintShopBalance()
+        {
+            do
+            {
+                PrintMessage("Shop balance");
+                InfoPrinter.PrintOneRow(_shop.ShopBalance + " UAH");
+            } while (!LeaveQuestion());
         }
 
         private void PrintProductList(List<ShopItem> list)

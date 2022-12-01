@@ -9,11 +9,11 @@ namespace InternetShop.Shop
     {
         private readonly List<User> _users = new List<User>();
         public readonly List<ShopItem> ProductList = new List<ShopItem>();
-        private double _shopBalance = 0;
+        public double ShopBalance = 0;
         private double ShopProfit
         {
-            get => _shopBalance;
-            set => _shopBalance += value < 10000 ? value * 0.05 : value * 0.1;
+            get => ShopBalance;
+            set => ShopBalance += value < 10000 ? value * 0.05 : value * 0.1;
         }
 
         // Interface methods
