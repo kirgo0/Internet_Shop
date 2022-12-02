@@ -9,12 +9,12 @@ namespace InternetShop
 {
     public class ShopController
     {
-        private OnlineShop _shop = new OnlineShop();
+        private readonly OnlineShop _shop = new OnlineShop();
         private UserList _users;
         private ItemList _items;
         private User _user;
-        private bool _signedIn = false;
-        private bool _adminMode = false;
+        private bool _signedIn;
+        private bool _adminMode;
         private IAdmin _admin;
         public ShopController(OnlineShop shop)
         {
@@ -64,7 +64,7 @@ namespace InternetShop
         }
         private void StartMessageHandler(string message)
         {
-            switch (message)
+            switch (message.Trim())
             {
                 case "1" :
                 {
@@ -157,7 +157,7 @@ namespace InternetShop
         {
             if (_user == null)
             {
-                switch (message)
+                switch (message.Trim())
                 {
                     case "1":
                     {
@@ -178,7 +178,7 @@ namespace InternetShop
             }
             else
             {
-                switch (message)
+                switch (message.Trim())
                 {
                     case "1":
                     {
@@ -217,45 +217,42 @@ namespace InternetShop
 
         private void AdminMessageHandler(string message)
         {
-            if (_adminMode)
+            if (!_adminMode) return;
+            switch (message.Trim())
             {
-                switch (message)
+                case "1":
                 {
-                    case "1":
-                    {
-                        PrintShopBalance();
-                        break;
-                    }
-                    case "2":
-                    {
-                        ProductListMenu(_shop.ProductList, "Shop product list");
-                        break;
-                    }
-                    case "3":
-                    {
-                        FindProduct();
-                        break;
-                    }
-                    case "4":
-                    {
-                        // Create new product
-                        CreateNewProductMenu();
-                        break;
-                    }
-                    case "5":
-                    {
-                        _user = null;
-                        _adminMode = false;
-                        _admin = null;
-                        _signedIn = false;
-                        break;
-                    }
+                    PrintShopBalance();
+                    break;
+                }
+                case "2":
+                {
+                    ProductListMenu(_shop.ProductList, "Shop product list");
+                    break;
+                }
+                case "3":
+                {
+                    FindProduct();
+                    break;
+                }
+                case "4":
+                {
+                    CreateNewProductMenu();
+                    break;
+                }
+                case "5":
+                {
+                    _user = null;
+                    _adminMode = false;
+                    _admin = null;
+                    _signedIn = false;
+                    break;
                 }
             }
         }
         private void FindProduct()
         {
-            bool isFinished = false;
+            var isFinished = false;
             do
             {            
                 PrintMessage("Print product name");
@@ -289,12 +286,12 @@ namespace InternetShop
                 InfoPrinter.PrintOneRow("1. Replenish the balance");
                 InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                 var msg = Console.ReadLine();
-                if (msg.ToLower() == "y")
+                if (msg.ToLower().Trim() == "y")
                 {
                     isFinished = true;
                     continue;
                 }
-                if (msg == "1")
+                if (msg.Trim() == "1")
                 {
                     msg = GetAnswer("Enter the amount you want to recharge");
                     try
@@ -303,9 +300,17 @@ namespace InternetShop
                     }
                     catch (Exception e)
                     {
+                        PrintMessage("The entered value must be a number");
                         continue;
                     }
-                    _user.UserBalance = Int32.Parse(msg);
+                    if (Int32.Parse(msg) > 0)
+                    {
+                        _user.UserBalance = Int32.Parse(msg);
+                    }
+                    else
+                    {
+                        PrintMessage("Enter a positive non-zero number", 1500);
+                    }
                 }
             } while (!isFinished);
         }
@@ -360,7 +365,7 @@ namespace InternetShop
                 InfoPrinter.PrintOneRow("Type #(number of product) for exact product information");
                 InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                 var msg = Console.ReadLine();
-                if (msg.ToLower() == "y")
+                if (msg.ToLower().Trim() == "y")
                 {
                     isFinished = true;
                     continue;
@@ -416,23 +421,27 @@ namespace InternetShop
                     {
                         InfoPrinter.PrintOneRow("Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
                     }
-                    InfoPrinter.PrintOneRow("1. Buy all items in the cart");
+                    InfoPrinter.PrintOneRow("1. Buy all products from cart");
+                    InfoPrinter.PrintOneRow("2. Remove a product from the cart");
                     InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                     var msg = Console.ReadLine();
-                    if (msg.ToLower() == "y")
+                    if (msg.ToLower().Trim() == "y")
                     {
                         isFinished = true;
                         continue;
                     }
-                    if (msg == "1")
+                    if (msg.Trim() == "1")
                     {
+                        PrintMessage("Are you sure you want to buy all products from your cart? (Y) to confirm (any key) to come back");
+                        msg = Console.ReadLine();
+                        if(msg.ToLower().Trim() != "y") continue;
                         if (_user.BuyItemsFromCart())
                         {
-                            PrintMessage("All items were successfully purchased",1500);
+                            PrintMessage("All products were successfully purchased",1500);
                         }
                         else
                         {
-                            PrintMessage("You don't have enough money on your balance to buy all the items in the cart");
+                            PrintMessage("You don't have enough money on your balance to buy all products from the cart");
                             InfoPrinter.PrintRow("");
                             InfoPrinter.PrintOneRow("Your cart");
                             for (var i = 0; i < _user.Cart.Count; i++)
@@ -441,15 +450,15 @@ namespace InternetShop
                                 InfoPrinter.PrintOneRow("#" + (i + 1) + " Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
                             }
                             InfoPrinter.PrintRow("");
-                            InfoPrinter.PrintOneRow("Type #(number) to remove an item from the cart");
+                            InfoPrinter.PrintOneRow("Type #(number) to remove a product from the cart");
                             InfoPrinter.PrintOneRow("1. Replenish balance");
                             InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                             msg = Console.ReadLine();
-                            if (msg.ToLower() == "y")
+                            if (msg.ToLower().Trim() == "y")
                             {
                                 continue;
                             }
-                            if (msg == "1")
+                            if (msg.Trim() == "1")
                             {
                                 BalanceMenu();
                                 continue;
@@ -468,12 +477,50 @@ namespace InternetShop
                                 var number = Int32.Parse(listNumber);
                                 if (_user.RemoveShopItemFromCart(number-1))
                                 {
-                                    PrintMessage("This item was removed from your cart",1500);
+                                    PrintMessage("This product was removed from your cart",1500);
                                 }
                                 else
                                 {
-                                    PrintMessage("You entered a wrong cart item number",1000);
+                                    PrintMessage("You entered a wrong cart product number",1000);
                                 }
+                            }
+                        }
+                    }
+                    if (msg.Trim() == "2")
+                    {
+                        InfoPrinter.PrintOneRow("Your cart");
+                        for (var i = 0; i < _user.Cart.Count; i++)
+                        {
+                            var item = _user.Cart[i];
+                            InfoPrinter.PrintOneRow("#" + (i + 1) + " Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
+                        }
+                        InfoPrinter.PrintRow("");
+                        InfoPrinter.PrintOneRow("Type product number which you want to remove from the cart");
+                        InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                        msg = Console.ReadLine();
+                        if (msg.ToLower().Trim() == "y")
+                        {
+                            continue;
+                        }
+                        if (msg.StartsWith("#"))
+                        {
+                            var listNumber = msg.Remove(0, 1);
+                            try
+                            {
+                                Int32.Parse(listNumber);
+                            }
+                            catch (FormatException e)
+                            {
+                                continue;
+                            }
+                            var number = Int32.Parse(listNumber);
+                            if (_user.RemoveShopItemFromCart(number-1))
+                            {
+                                PrintMessage("This item was removed from your cart",1500);
+                            }
+                            else
+                            {
+                                PrintMessage("You entered a wrong cart item number",1000);
                             }
                         }
                     }
@@ -483,7 +530,7 @@ namespace InternetShop
                     InfoPrinter.PrintOneRow("Your cart as empty");
                     InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                     var msg = Console.ReadLine();
-                    if (msg.ToLower() == "y")
+                    if (msg.ToLower().Trim() == "y")
                     {
                         isFinished = true;
                         continue;
@@ -503,49 +550,50 @@ namespace InternetShop
                 PrintProductDescription(item.ItemDescription);
                 if (_user != null && _adminMode)
                 {
-                    InfoPrinter.PrintOneRow("1. Change an item");
-                    InfoPrinter.PrintOneRow("2. Remove an item");
+                    InfoPrinter.PrintOneRow("1. Change a product");
+                    InfoPrinter.PrintOneRow("2. Remove a product");
                     InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                     var msg = Console.ReadLine();
-                    if (msg.ToLower() == "y")
+                    if (msg.ToLower().Trim() == "y")
                     { 
                         isFinished = true;
                         continue;
                     }
-                    if (msg == "1")
+                    if (msg.Trim() == "1")
                     {
                         ChangeProductMenu(item);
                         isFinished = true;
-                    } else if (msg == "2")
+                    } else if (msg.Trim() == "2")
                     {
                         PrintMessage("Are you sure you want to remove this product from shop product list?");
                         InfoPrinter.PrintOneRow("(Y) to confirm removing (any key) to come back");
                         msg = Console.ReadLine();
-                        if (msg.ToLower() == "y")
+                        if (msg.ToLower().Trim() == "y")
                         {
                             if (_admin.RemoveItem(item.ItemName))
                             {
-                                PrintMessage("This product was successfully removed");
+                                PrintMessage("This product was successfully removed",1500);
+                                isFinished = true;
                             }
                             else
                             {
-                                PrintMessage("Unexpected error, removing operation closed");
+                                PrintMessage("Unexpected error, removing operation closed",1500);
                             }
                         }
                     }
                 }
                 else if (_user != null)
                 {
-                    InfoPrinter.PrintOneRow("1. Add an item to a cart");
-                    InfoPrinter.PrintOneRow("2. Buy an item");
+                    InfoPrinter.PrintOneRow("1. Add a product to a cart");
+                    InfoPrinter.PrintOneRow("2. Buy a product");
                     InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                     var msg = Console.ReadLine();
-                    if (msg.ToLower() == "y")
+                    if (msg.ToLower().Trim() == "y")
                     { 
                         isFinished = true;
                         continue;
                     }
-                    if (msg == "1")
+                    if (msg.Trim() == "1")
                     {
                         if ( _user.AddShopItemToCart(item.ItemName))
                         {
@@ -555,7 +603,7 @@ namespace InternetShop
                         {
                             PrintMessage("Unexpected error, form closed",1500);
                         }
-                    } else if (msg == "2")
+                    } else if (msg.Trim() == "2")
                     {
                         if (_user.UserBalance >= item.ItemPrice)
                         {
@@ -575,7 +623,7 @@ namespace InternetShop
                 {
                     InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
                     var msg = Console.ReadLine();
-                    if (msg.ToLower() == "y")
+                    if (msg.ToLower().Trim() == "y")
                     { 
                         isFinished = true;
                     }
@@ -590,10 +638,10 @@ namespace InternetShop
             {
                 PrintMessage("You sure you want to create new product? (Y) to continue (any key) to come back");
                 var msg = Console.ReadLine();
-                if (msg.ToLower() == "y")
+                if (msg.ToLower().Trim() == "y")
                 {
                     string itemName ="", itemDescription = "";
-                    double itemPrice = 0.0;
+                    int itemPrice = 0;
                     do
                     {
                         PrintMessage("New product");
@@ -610,19 +658,19 @@ namespace InternetShop
                             msg = Console.ReadLine();
                             try
                             {
-                                Double.Parse(msg);
+                                Int32.Parse(msg);
                             }
                             catch (FormatException e)
                             {
                                 PrintMessage("Price might be a number!", 1500);
                                 continue;
                             }
-                            if (Double.Parse(msg) <= 0)
+                            if (Int32.Parse(msg) <= 0)
                             {
                                 PrintMessage("Price might be a positive not zero number!", 1500);
                                 continue;
                             }
-                            itemPrice = Double.Parse(msg);
+                            itemPrice = Int32.Parse(msg);
                         }
                         else if (itemDescription.Length == 0)
                         {
@@ -643,32 +691,32 @@ namespace InternetShop
                                 InfoPrinter.PrintOneRow("4. Change product description");
                                 InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                                 msg = Console.ReadLine();
-                                if (msg.ToLower() == "y") isFinished = true;
-                                if (msg == "1")
+                                if (msg.ToLower().Trim() == "y") isFinished = true;
+                                if (msg.Trim() == "1")
                                 {
                                     if (_admin.CreateNewItem(itemName, itemPrice, itemDescription))
                                     {
-                                        PrintMessage("New item was successfully created!", 1500);
+                                        PrintMessage("New product was successfully created!", 1500);
                                         isFinished = true;
                                     }
                                     else
                                     {
-                                        PrintMessage("Item with this name already exists");
+                                        PrintMessage("A product with this name already exists");
                                     }
                                 }
-                                if (msg == "2")
+                                if (msg.Trim() == "2")
                                 {
                                     itemName = "";
                                     break;
                                 }
 
-                                if (msg == "3")
+                                if (msg.Trim() == "3")
                                 {
                                     itemPrice = 0;
                                     break;
                                 }
 
-                                if (msg == "4")
+                                if (msg.Trim() == "4")
                                 {
                                     itemDescription = "";
                                     break;
@@ -688,7 +736,7 @@ namespace InternetShop
         {
             var item = (ShopItemExtended)shopItem;
             string itemName = item.ItemName, itemDescription = item.ItemDescription;
-            double itemPrice = item.ItemPrice;
+            int itemPrice = item.ItemPrice;
             bool isFinished = false;
             do
             {
@@ -703,25 +751,25 @@ namespace InternetShop
                 }
                 else if (itemPrice == 0)
                 {
-                    InfoPrinter.PrintOneRow("Enter product price");
+                    InfoPrinter.PrintOneRow("Enter the price of the product");
                     msg = Console.ReadLine();
                     try
                     {
-                        Double.Parse(msg);
+                        Int32.Parse(msg);
                     }
                     catch (FormatException e)
                     {
-                        PrintMessage("Price might be a number!", 1500);
+                        PrintMessage("The price should be a number!", 1500);
                         continue;
                     }
 
-                    if (Double.Parse(msg) <= 0)
+                    if (Int32.Parse(msg) <= 0)
                     {
-                        PrintMessage("Price might be a positive not zero number!", 1500);
+                        PrintMessage("The price must be a positive non-zero number!", 1500);
                         continue;
                     }
 
-                    itemPrice = Double.Parse(msg);
+                    itemPrice = Int32.Parse(msg);
                 }
                 else if (itemDescription.Length == 0)
                 {
@@ -737,31 +785,45 @@ namespace InternetShop
                     do
                     {
                         InfoPrinter.PrintOneRow("1. Change product name");
-                        InfoPrinter.PrintOneRow("2. Change product price");
+                        InfoPrinter.PrintOneRow("2. Change the price of the product");
                         InfoPrinter.PrintOneRow("3. Change product description");
-                        InfoPrinter.PrintOneRow("4. Save all Changes");
+                        InfoPrinter.PrintOneRow("4. Save all changes");
                         InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                         msg = Console.ReadLine();
-                        if (msg.ToLower() == "y") isFinished = true;
-                        if (msg == "1")
+                        if (msg.ToLower().Trim() == "y") isFinished = true;
+                        if (msg.Trim() == "1")
                         {
                             itemName = "";
                             break;
                         }
-                        if (msg == "2")
+                        if (msg.Trim() == "2")
                         {
                             itemPrice = 0;
                             break;
                         }
-                        if (msg == "3")
+                        if (msg.Trim() == "3")
                         {
                             itemDescription = "";
                             break;
+                        }
+
+                        if (msg.Trim() == "4")
+                        {
+                            if(_admin.ChangeShopItem(item.ItemName, itemName, itemPrice, itemDescription))
+                            {
+                                PrintMessage("This product was successfully changed!",1500);
+                                isFinished = true;
+                            }
+                            else
+                            {
+                                PrintMessage("Unexpected error product change form closed",1500);
+                            }
                         }
                     } while (!isFinished);
                 }
             } while (!isFinished);
         } 
+       
         private string GetAnswer(string question)
         {
             PrintMessage(question);
@@ -772,7 +834,7 @@ namespace InternetShop
         {
             InfoPrinter.PrintOneRow("Do You want to come back (Y) or try again? (Any key)");
             var msg = Console.ReadLine().ToLower();
-            return msg == "y";
+            return msg.Trim() == "y";
         }
 
         private void PrintMessage(string message, int delay)
@@ -825,9 +887,7 @@ namespace InternetShop
             InfoPrinter.PrintOneRow("2. View products");
             InfoPrinter.PrintOneRow("3. Find a product");
             InfoPrinter.PrintOneRow("4. Create a new product");
-            InfoPrinter.PrintOneRow("5. Change product");
-            InfoPrinter.PrintOneRow("6. Delete product");
-            InfoPrinter.PrintOneRow("7. Sign out");
+            InfoPrinter.PrintOneRow("5. Sign out");
         }
 
         private void PrintUserPurchase()
@@ -873,7 +933,7 @@ namespace InternetShop
                 else
                 {
                     string[] itemNames;
-                    double[] itemPrices;
+                    int[] itemPrices;
                     if(count - i == 2)
                     {
                         itemNames = new string[]

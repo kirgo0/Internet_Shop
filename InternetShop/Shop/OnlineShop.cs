@@ -17,11 +17,24 @@ namespace InternetShop.Shop
         }
 
         // Interface methods
-        public bool CreateNewShopItem(string itemName, double itemPrice, string itemDescription)
+        public bool CreateNewShopItem(string itemName, int itemPrice, string itemDescription)
         {
             if (GetShopItem(itemName) == null)
             {
                 ProductList.Add(new ShopItemExtended(itemName,itemPrice,itemDescription));
+                return true;
+            }
+            return false;
+        }
+
+        public bool ChangeShopItem(string itemName, string newItemName, int newItemPrice, string newItemDescription)
+        {
+            if (GetShopItem(itemName) != null)
+            {
+                var item = (ShopItemExtended) GetShopItem(itemName);
+                item.ItemName = newItemName;
+                item.ItemPrice = newItemPrice;
+                item.ItemDescription = newItemDescription;
                 return true;
             }
             return false;

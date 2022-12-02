@@ -10,11 +10,11 @@ namespace InternetShop.Users
         protected IShop Shop { get; set; }
         public string UserName { get; set; }
         private string Password { get; set; }
-        private double _balance;
+        private int _balance;
 
         public AccountType CheckAccountType { get; }
 
-        public double UserBalance
+        public int UserBalance
         {
             get => _balance;
             set => _balance += value;
@@ -22,7 +22,7 @@ namespace InternetShop.Users
         public readonly List<ShopItem> Cart;
         public readonly List<ShopItem> PurchaseHistory;
 
-        protected User(List<ShopItem> basket, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, double userBalance, AccountType checkAccountType)
+        protected User(List<ShopItem> basket, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, int userBalance, AccountType checkAccountType)
         {
             Cart = basket;
             PurchaseHistory = purchaseHistory;

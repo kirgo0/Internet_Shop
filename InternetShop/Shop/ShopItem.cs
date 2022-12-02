@@ -3,9 +3,9 @@
     public class ShopItem
     {
         public string ItemName { get; set; }
-        public double ItemPrice { get; set; }
+        public int ItemPrice { get; set; }
 
-        public ShopItem(string itemName, double itemPrice)
+        public ShopItem(string itemName, int itemPrice)
         {
             ItemName = itemName;
             ItemPrice = itemPrice;
