@@ -34,7 +34,7 @@ namespace InternetShop
                 {
                     PrintStartMenu();
                     string message = Console.ReadLine();
-                    if(message == "Exit") return;
+                    if(message.ToLower().Trim() == "exit") return;
                     StartMessageHandler(message);
                     while (_signedIn)
                     {
@@ -42,7 +42,7 @@ namespace InternetShop
                         {
                             PrintAdminMenu();
                             message = Console.ReadLine();
-                            if(message == "Exit") return;
+                            if(message.ToLower().Trim() == "exit") return;
                             AdminMessageHandler(message);
                             continue;
                         }
@@ -55,10 +55,10 @@ namespace InternetShop
                             PrintDefaultMenu();
                         }
                         message = Console.ReadLine();
-                        if(message == "Exit") return;
+                        if(message.ToLower().Trim() == "exit") return;
                         ShopMessageHandler(message);
                     }
-                    if(message == "Exit") return;
+                    if(message.ToLower().Trim() == "exit") return;
                 }
             }
         }
@@ -386,7 +386,7 @@ namespace InternetShop
                     {
                         try
                         {
-                            ProductMenu(currentPageItems[Int32.Parse(productNumber) - 1]);
+                            if (ProductMenu(currentPageItems[Int32.Parse(productNumber) - 1])) isFinished = true;
                         }
                         catch (ArgumentOutOfRangeException e)
                         {
@@ -539,7 +539,7 @@ namespace InternetShop
             } while(!isFinished);
         }
 
-        private void ProductMenu(ShopItem shopItem)
+        private bool ProductMenu(ShopItem shopItem)
         {
             bool isFinished = false;
             do
@@ -573,11 +573,12 @@ namespace InternetShop
                             if (_admin.RemoveItem(item.ItemName))
                             {
                                 PrintMessage("This product was successfully removed",1500);
-                                isFinished = true;
+                                return true;
                             }
                             else
                             {
                                 PrintMessage("Unexpected error, removing operation closed",1500);
+                                return false;
                             }
                         }
                     }
@@ -629,6 +630,7 @@ namespace InternetShop
                     }
                 }
             } while (!isFinished);
+            return false;
         }
 
         private void CreateNewProductMenu()
@@ -862,6 +864,7 @@ namespace InternetShop
             PrintMessage("1. Sign Up");
             InfoPrinter.PrintOneRow("2. Sign In");
             InfoPrinter.PrintOneRow("3. Sign In as guest");
+            InfoPrinter.PrintOneRow("Exit the program (Exit)");
         }
 
         private void PrintDefaultMenu()
