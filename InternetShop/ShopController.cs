@@ -86,32 +86,41 @@ namespace InternetShop
 
         private User SignUp()
         {
-            string userName,password1;
             do
             {
-                userName = GetAnswer("Write your login");
-                password1 = GetAnswer("Write your password");
+                var userName = GetAnswer("Write your login");
+                var password1 = GetAnswer("Write your password");
                 var password2 = GetAnswer("Write your password again");
-                if (password1 == password2)
+                if (userName.Contains(" ") || password1.Contains(" ") || password2.Contains(" "))
+                {
+                    PrintMessage("Username and password must not contain spaces", 1500);
+                    continue;
+                }if (password1 == password2)
                 {
                     if (_shop.SignUp(userName, password1, password2) == null)
                     {
                         PrintMessage("This username are used already",1500);
+                        if (LeaveQuestion())
+                        {
+                            PrintMessage("Sign Up form is closed!",1500);
+                            _signedIn = false;
+                            return null;
+                        }
                         continue;
                     }
                     var user = _shop.SignIn(userName,password1);
-                    PrintMessage(user.UserName +  " You successfully Signed Up!",1500);
+                    PrintMessage(user.UserName +  " you successfully Signed Up!",1500);
                     _signedIn = true;
                     return user;
                 }
                 PrintMessage("Written passwords are not same",1500);
                 if (LeaveQuestion())
                 {
-                    PrintMessage("Sign Up form are canceled!",1500);
+                    PrintMessage("Sign Up form is closed!",1500);
                     _signedIn = false;
                     return null;
                 }
-            } while (_shop.SignIn(userName, password1) == null);
+            } while (true);
             return null;
         }
 
@@ -122,12 +131,17 @@ namespace InternetShop
             {
                 userName = GetAnswer("Write your login");
                 password = GetAnswer("Write your password");
+                if (userName.Contains(" ") || password.Contains(" "))
+                {
+                    PrintMessage("Username and password must not contain spaces", 1500);
+                    continue;
+                }
                 if (_shop.SignIn(userName, password) == null)
                 {
                     PrintMessage("Username or password is wrong",1500);
                     if (LeaveQuestion())
                     {
-                        PrintMessage("Sign In form are canceled!",1500);
+                        PrintMessage("Sign In form is closed!",1500);
                         return null;
                     }
                 }
@@ -138,13 +152,13 @@ namespace InternetShop
                     {
                         _adminMode = true;
                         _admin = (IAdmin) user;
-                        PrintMessage("Admin " + user.UserName +  " You are successfully Signed In!",1500);
+                        PrintMessage("Admin " + user.UserName +  " you are successfully Signed In!",1500);
                     }
                     else
                     {
                         _adminMode = false;
                         _admin = null;
-                        PrintMessage(user.UserName +  " You are successfully Signed In!",1500);
+                        PrintMessage(user.UserName +  " you are successfully Signed In!",1500);
                     }
                     _signedIn = true;
                     return user;
@@ -284,7 +298,7 @@ namespace InternetShop
             {
                 PrintMessage("Balance: " + _user.UserBalance + " UAH");
                 InfoPrinter.PrintOneRow("1. Replenish the balance");
-                InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                 var msg = Console.ReadLine();
                 if (msg.ToLower().Trim() == "y")
                 {
@@ -363,7 +377,7 @@ namespace InternetShop
                     InfoPrinter.PrintOneRow(bottomMenu);
                 }
                 InfoPrinter.PrintOneRow("Type #(number of product) for exact product information");
-                InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                 var msg = Console.ReadLine();
                 if (msg.ToLower().Trim() == "y")
                 {
@@ -452,7 +466,7 @@ namespace InternetShop
                             InfoPrinter.PrintRow("");
                             InfoPrinter.PrintOneRow("Type #(number) to remove a product from the cart");
                             InfoPrinter.PrintOneRow("1. Replenish balance");
-                            InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                            InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                             msg = Console.ReadLine();
                             if (msg.ToLower().Trim() == "y")
                             {
@@ -496,7 +510,7 @@ namespace InternetShop
                         }
                         InfoPrinter.PrintRow("");
                         InfoPrinter.PrintOneRow("Type product number which you want to remove from the cart");
-                        InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                        InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                         msg = Console.ReadLine();
                         if (msg.ToLower().Trim() == "y")
                         {
@@ -552,7 +566,7 @@ namespace InternetShop
                 {
                     InfoPrinter.PrintOneRow("1. Change a product");
                     InfoPrinter.PrintOneRow("2. Remove a product");
-                    InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                    InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                     var msg = Console.ReadLine();
                     if (msg.ToLower().Trim() == "y")
                     { 
@@ -587,7 +601,7 @@ namespace InternetShop
                 {
                     InfoPrinter.PrintOneRow("1. Add a product to a cart");
                     InfoPrinter.PrintOneRow("2. Buy a product");
-                    InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                    InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                     var msg = Console.ReadLine();
                     if (msg.ToLower().Trim() == "y")
                     { 
@@ -622,7 +636,7 @@ namespace InternetShop
                 }
                 else
                 {
-                    InfoPrinter.PrintOneRow("Do You want to come back? (Y)");
+                    InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                     var msg = Console.ReadLine();
                     if (msg.ToLower().Trim() == "y")
                     { 
@@ -829,12 +843,12 @@ namespace InternetShop
         private string GetAnswer(string question)
         {
             PrintMessage(question);
-            return Console.ReadLine();
+            return Console.ReadLine().Trim();
         }
         
         private bool LeaveQuestion()
         {
-            InfoPrinter.PrintOneRow("Do You want to come back (Y) or try again? (Any key)");
+            InfoPrinter.PrintOneRow("Do you want to come back (Y) or try again? (Any key)");
             var msg = Console.ReadLine().ToLower();
             return msg.Trim() == "y";
         }
