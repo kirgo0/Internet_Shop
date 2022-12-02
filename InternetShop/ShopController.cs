@@ -502,14 +502,14 @@ namespace InternetShop
                     }
                     if (msg.Trim() == "2")
                     {
-                        InfoPrinter.PrintOneRow("Your cart");
+                        PrintMessage("Your cart");
                         for (var i = 0; i < _user.Cart.Count; i++)
                         {
                             var item = _user.Cart[i];
                             InfoPrinter.PrintOneRow("#" + (i + 1) + " Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH");
                         }
                         InfoPrinter.PrintRow("");
-                        InfoPrinter.PrintOneRow("Type product number which you want to remove from the cart");
+                        InfoPrinter.PrintOneRow("Type product (#number) which you want to remove from the cart");
                         InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                         msg = Console.ReadLine();
                         if (msg.ToLower().Trim() == "y")
