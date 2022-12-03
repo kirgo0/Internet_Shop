@@ -1,6 +1,4 @@
-﻿using System;
-using InternetShop.Shop;
-using InternetShop.Users;
+﻿using InternetShop.Shop;
 
 namespace InternetShop
 {
@@ -23,7 +21,7 @@ namespace InternetShop
             shop.CreateNewShopItem("MSI GeForce RTX 3060 12GB", 17050,"The GeForce RTX 3060 lets you take on the latest games using the power of Ampere, NVIDIA's 2nd generation RTX architecture. Get incredible performance with enhanced Ray Tracing Cores and Tensor Cores, new streaming multiprocessors, and high-speed G6 memory.");
             // shop.CreateNewShopItem("MSI GeForce RTX 3060 13GB", 17050,"The GeForce RTX 3060 lets you take on the latest games using the power of Ampere, NVIDIA's 2nd generation RTX architecture. Get incredible performance with enhanced Ray Tracing Cores and Tensor Cores, new streaming multiprocessors, and high-speed G6 memory.");
             shop.SignUpAdmin("Kirgo", "kirgotop", "kirgotop");
-            shop.SignUp("Solify", "1234", "1234");
+            shop.SignUp("Solify", "1234", "1234").AddShopItemToCart("NVIDIA GTX 1050 TI 4GB");
             ShopController controller = new ShopController(shop);
             controller.Run();
         }

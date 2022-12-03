@@ -10,8 +10,6 @@ namespace InternetShop
     public class ShopController
     {
         private readonly OnlineShop _shop = new OnlineShop();
-        private UserList _users;
-        private ItemList _items;
         private User _user;
         private bool _signedIn;
         private bool _adminMode;
@@ -19,11 +17,6 @@ namespace InternetShop
         public ShopController(OnlineShop shop)
         {
             _shop = shop;
-        }
-        public ShopController(UserList users, ItemList items)
-        {
-            _users = users;
-            _items = items;
         }
 
         public void Run()
@@ -34,7 +27,11 @@ namespace InternetShop
                 {
                     PrintStartMenu();
                     string message = Console.ReadLine();
-                    if(message.ToLower().Trim() == "exit") return;
+                    if(message.ToLower().Trim() == "exit")
+                    {
+                        _shop.WriteUsersList();
+                        return;
+                    }
                     StartMessageHandler(message);
                     while (_signedIn)
                     {
@@ -58,10 +55,15 @@ namespace InternetShop
                         if(message.ToLower().Trim() == "exit") return;
                         ShopMessageHandler(message);
                     }
-                    if(message.ToLower().Trim() == "exit") return;
+                    if (message.ToLower().Trim() == "exit")
+                    {
+                        _shop.WriteUsersList();
+                        return;
+                    }
                 }
             }
         }
+
         private void StartMessageHandler(string message)
         {
             switch (message.Trim())

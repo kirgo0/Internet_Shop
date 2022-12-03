@@ -5,31 +5,42 @@ using InternetShop.Shop;
 
 namespace InternetShop.Users
 {
+    [DataContract]
     public abstract class User 
     {
+        // [DataMember]
         protected IShop Shop { get; set; }
+        
+        [DataMember]
         public string UserName { get; set; }
+        
+        [DataMember] 
         private string Password { get; set; }
-        private int _balance;
 
-        public AccountType CheckAccountType { get; }
+        [DataMember] 
+        private int _balance { get; set; }
+
+        [DataMember]        
+        public AccountType CheckAccountType { get; set; }
 
         public int UserBalance
         {
             get => _balance;
             set => _balance += value;
         }
+        // [DataMember]        
         public readonly List<ShopItem> Cart;
+        // [DataMember]        
         public readonly List<ShopItem> PurchaseHistory;
 
-        protected User(List<ShopItem> basket, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, int userBalance, AccountType checkAccountType)
+        protected User(int balance, List<ShopItem> cart, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, AccountType checkAccountType)
         {
-            Cart = basket;
+            _balance = balance;
+            Cart = cart;
             PurchaseHistory = purchaseHistory;
             Shop = shop;
             UserName = userName;
             Password = password;
-            UserBalance = userBalance;
             CheckAccountType = checkAccountType;
         }
 

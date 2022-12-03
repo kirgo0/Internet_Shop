@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using InternetShop.Shop;
 
 namespace InternetShop.Users
 {
+    [DataContract]
     public class Admin : User , IAdmin
     {
         public Admin(string userName, string password) : base(userName, password, AccountType.Admin)

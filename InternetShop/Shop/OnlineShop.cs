@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Json;
 using System.Threading;
+using InternetShop.Data;
 using InternetShop.Users;
 
 namespace InternetShop.Shop
@@ -73,9 +76,15 @@ namespace InternetShop.Shop
 
         // Class methods
 
-        public void LoadUsersList()
+        public void WriteUsersList()
         {
-            
+            UserList users = new UserList(_users);
+            DataContractJsonSerializer jsonF = new DataContractJsonSerializer(typeof(UserList));
+
+            using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            {
+                jsonF.WriteObject(fs,users);
+            }
         }
 
         public User SignUpAdmin(string userName, string password, string passwordRepeat)
