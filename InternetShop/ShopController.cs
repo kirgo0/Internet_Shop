@@ -428,6 +428,7 @@ namespace InternetShop
             bool isFinished = false;
             do
             {
+                _user.CheckCartProducts();
                 PrintMessage("Your cart");
                 if (_user.Cart.Count != 0)
                 {
@@ -541,7 +542,7 @@ namespace InternetShop
                 }
                 else
                 {
-                    InfoPrinter.PrintOneRow("Your cart as empty");
+                    InfoPrinter.PrintOneRow("Your cart is empty");
                     InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
                     var msg = Console.ReadLine();
                     if (msg.ToLower().Trim() == "y")

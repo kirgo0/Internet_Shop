@@ -110,6 +110,18 @@ namespace InternetShop.Users
             return true;
         }
 
+        public void CheckCartProducts()
+        {
+            for (int i = 0; i < Cart.Count; i++)
+            {
+                var item = Cart[i];
+                if (Shop.GetShopItem(item.ItemName) == null)
+                {
+                    Cart.Remove(item);
+                    i--;
+                }
+            }
+        }
         public bool BuyItem(string itemName)
         {
             if (GetShopItem(itemName) != null)
