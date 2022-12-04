@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading;
 using InternetShop.Data;
 using InternetShop.Users;
+using Newtonsoft.Json;
 
 namespace InternetShop.Shop
 {
     public class OnlineShop : IShop
     {
-        private readonly List<User> _users = new List<User>();
-        public readonly List<ShopItem> ProductList = new List<ShopItem>();
+        private List<User> _users = new List<User>();
+        public List<ShopItem> ProductList = new List<ShopItem>();
         public double ShopBalance = 0;
         private double ShopProfit
         {
@@ -76,14 +78,35 @@ namespace InternetShop.Shop
 
         // Class methods
 
-        public void WriteUsersList()
+        public void SaveData()
         {
-            UserList users = new UserList(_users);
-            DataContractJsonSerializer jsonF = new DataContractJsonSerializer(typeof(UserList));
-
-            using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            var userList = new UserList(_users);
+            var dbContextJson = JsonConvert.SerializeObject(userList, Formatting.Indented, new JsonSerializerSettings
             {
-                jsonF.WriteObject(fs,users);
+                TypeNameHandling = TypeNameHandling.Auto
+            });
+            File.WriteAllText("users.json", dbContextJson);
+        }
+        
+        public void GetData()
+        {
+            try
+            {
+                var data = File.ReadAllText("users.json");
+                var userList = JsonConvert.DeserializeObject<UserList>(data, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
+                if (userList == null) return;
+                _users = userList.List;
+                foreach (var user in _users)
+                {
+                    user.GetShop(this);
+                }
+            }
+            catch (IOException e)
+            {
+                _users = new List<User>();
             }
         }
 

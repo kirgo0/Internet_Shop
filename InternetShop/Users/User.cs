@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
+
 using InternetShop.Shop;
 
 namespace InternetShop.Users
 {
-    [DataContract]
+    [JsonObject]
     public abstract class User 
     {
         // [DataMember]
         protected IShop Shop { get; set; }
         
-        [DataMember]
         public string UserName { get; set; }
         
-        [DataMember] 
+        [JsonRequired]
         private string Password { get; set; }
 
-        [DataMember] 
+        [JsonRequired]
         private int _balance { get; set; }
 
-        [DataMember]        
+        [JsonRequired]
         public AccountType CheckAccountType { get; set; }
 
+        [JsonIgnore]
         public int UserBalance
         {
             get => _balance;

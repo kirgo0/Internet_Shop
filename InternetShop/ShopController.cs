@@ -21,6 +21,11 @@ namespace InternetShop
 
         public void Run()
         {
+            // for (int i = 0; i < 28; i++)
+            // {
+            //     _shop.CreateNewShopItem("NVIDIA GTX 1060 6GB" + " (" + i + ")", 15600,"The PNY GeForce GTX 1060 graphics card is loaded with innovative new gaming technologies, making it the perfect choice for the latest high-definition games. Powered by NVIDIA Pascal™ – the most advanced GPU architecture ever created – the GeForce GTX 1060 delivers brilliant performance that opens the door to virtual reality and beyond.");
+            // }
+            _shop.GetData();
             while(true)
             {
                 while (_user == null)
@@ -28,8 +33,8 @@ namespace InternetShop
                     PrintStartMenu();
                     string message = Console.ReadLine();
                     if(message.ToLower().Trim() == "exit")
-                    {
-                        _shop.WriteUsersList();
+                    {            
+                        _shop?.SaveData();
                         return;
                     }
                     StartMessageHandler(message);
@@ -57,7 +62,7 @@ namespace InternetShop
                     }
                     if (message.ToLower().Trim() == "exit")
                     {
-                        _shop.WriteUsersList();
+                        _shop?.SaveData();
                         return;
                     }
                 }
