@@ -6,10 +6,11 @@ using Newtonsoft.Json;
 
 namespace InternetShop.Shop
 {
-    public class OnlineShop : IShop
+    public class OnlineShop : IShop, ILoader
     {
         private List<User> _users = new List<User>();
         public List<ShopItem> ProductList = new List<ShopItem>();
+        public List<ShopItemHistory> ShopHistory = new List<ShopItemHistory>();
         public double ShopBalance = 0;
         private double ShopProfit
         {
@@ -54,7 +55,7 @@ namespace InternetShop.Shop
             }
             return null;
         }
-
+        
         public List<ShopItem> GetShopItems(string keyWord)
         {
             List<ShopItem> shopItems = new List<ShopItem>();
@@ -65,10 +66,13 @@ namespace InternetShop.Shop
             return shopItems;
         }
 
-        public ShopItem BuyShopItem(string itemName)
+        public ShopItem BuyShopItem(string itemName, User user)
         {
             if (GetShopItem(itemName) == null) return null;
             ShopProfit = GetShopItem(itemName).ItemPrice;
+            var itemHistory = new ShopItemHistory(GetShopItem(itemName).ItemName, GetShopItem(itemName).ItemPrice, user.UserName);
+            // ShopHistory.Add(itemHistory);
+            ShopHistory.Insert(0,itemHistory);
             return GetShopItem(itemName);
         }
 
@@ -112,50 +116,48 @@ namespace InternetShop.Shop
         
         public void SaveData()
         {
-            var userList = new UserData(_users);
-            var itemList = new ItemData(ProductList);
-            var dataJson = JsonConvert.SerializeObject(userList, Formatting.Indented, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            });
-            File.WriteAllText("users.json", dataJson);
-            dataJson = JsonConvert.SerializeObject(itemList, Formatting.Indented, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            });
-            File.WriteAllText("items.json", dataJson);
+            DataSerializer dataSerializer = new DataSerializer();
+            dataSerializer.SaveData(this);
         }
         
         public void GetData()
         {
-            try
-            {
-                var data = File.ReadAllText("users.json");
-                var userList = JsonConvert.DeserializeObject<UserData>(data, new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto
-                });
-                if (userList == null) return;
-                _users = userList.List;
+            DataSerializer dataSerializer = new DataSerializer();
+            dataSerializer.GetData(this);
+            if(_users.Count != 0)
                 foreach (var user in _users)
                 {
                     user.GetShop(this);
                 }
-                // product loader
-                data = File.ReadAllText("items.json");
-                var itemList = JsonConvert.DeserializeObject<ItemData>(data, new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto
-                });
-                if(itemList == null) return;
-                ProductList = itemList.List;
-            }
-            catch (IOException e)
-            {
-                _users = new List<User>();
-            }
         }
 
+        // ILoader interface methods
+        public List<ShopItemHistory> GetShopHistory()
+        {
+            return ShopHistory;
+        }
 
+        public List<User> GetUsers()
+        {
+            return _users;
+        }
+
+        public List<ShopItem> GetProductList()
+        {
+            return ProductList;
+        }
+
+        public double GetShopBalance()
+        {
+            return ShopBalance;
+        }
+
+        public void LoadData(List<ShopItemHistory> shopHistory, double shopBalance, List<User> users, List<ShopItem> productList)
+        {
+            if(shopHistory != null) ShopHistory = shopHistory;
+            ShopBalance = shopBalance;
+            if(users != null) _users = users;
+            if(productList != null) ProductList = productList;
+        }
     }
 }

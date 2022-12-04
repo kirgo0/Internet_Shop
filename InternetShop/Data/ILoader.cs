@@ -7,10 +7,10 @@ namespace InternetShop.Data
 {
     public interface ILoader
     {
-        List<ShopItem> GetShopHistory();
+        List<ShopItemHistory> GetShopHistory();
         List<User> GetUsers();
         List<ShopItem> GetProductList();
         double GetShopBalance();
-        void LoadData(List<ShopItem> shopHistory, double shopBalance, List<User> users, List<ShopItem> productList);
+        void LoadData(List<ShopItemHistory> shopHistory, double shopBalance, List<User> users, List<ShopItem> productList);
     }
 }

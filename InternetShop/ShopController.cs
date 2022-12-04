@@ -19,16 +19,38 @@ namespace InternetShop
             _shop = shop;
         }
 
+        private void StartMessageHandler(string message)
+        {
+            switch (message.Trim())
+            {
+                case "1" :
+                {
+                    _user = SignUp();
+                    break;
+                }
+                case "2":
+                {
+                    _user = SignIn();
+                    break;
+                }
+                case "3":
+                {
+                    _signedIn = true;
+                    break;
+                }
+            }
+        }
+
         public void Run()
         {
-            _shop.GetData();
+            _shop?.GetData();
             while(true)
             {
                 while (_user == null)
                 {
                     PrintStartMenu();
                     string message = Console.ReadLine();
-                    if(message.ToLower().Trim() == "exit")
+                    if(message?.ToLower().Trim() == "exit")
                     {            
                         _shop?.SaveData();
                         return;
@@ -53,36 +75,14 @@ namespace InternetShop
                             PrintDefaultMenu();
                         }
                         message = Console.ReadLine();
-                        if(message.ToLower().Trim() == "exit") return;
+                        if(message?.ToLower().Trim() == "exit") return;
                         ShopMessageHandler(message);
                     }
-                    if (message.ToLower().Trim() == "exit")
+                    if (message?.ToLower().Trim() == "exit")
                     {
                         _shop?.SaveData();
                         return;
                     }
-                }
-            }
-        }
-
-        private void StartMessageHandler(string message)
-        {
-            switch (message.Trim())
-            {
-                case "1" :
-                {
-                    _user = SignUp();
-                    break;
-                }
-                case "2":
-                {
-                    _user = SignIn();
-                    break;
-                }
-                case "3":
-                {
-                    _signedIn = true;
-                    break;
                 }
             }
         }
@@ -98,33 +98,37 @@ namespace InternetShop
                 {
                     PrintMessage("Username and password must not contain spaces", 1500);
                     continue;
-                }if (password1 == password2)
+                }
+
+                if (password1 == password2)
                 {
                     if (_shop.SignUp(userName, password1, password2) == null)
                     {
-                        PrintMessage("This username are used already",1500);
+                        PrintMessage("This username are used already", 1500);
                         if (LeaveQuestion())
                         {
-                            PrintMessage("Sign Up form is closed!",1500);
+                            PrintMessage("Sign Up form is closed!", 1500);
                             _signedIn = false;
                             return null;
                         }
+
                         continue;
                     }
-                    var user = _shop.SignIn(userName,password1);
-                    PrintMessage(user.UserName +  " you successfully Signed Up!",1500);
+
+                    var user = _shop.SignIn(userName, password1);
+                    PrintMessage(user.UserName + " you successfully Signed Up!", 1500);
                     _signedIn = true;
                     return user;
                 }
-                PrintMessage("Written passwords are not same",1500);
+
+                PrintMessage("Written passwords are not same", 1500);
                 if (LeaveQuestion())
                 {
-                    PrintMessage("Sign Up form is closed!",1500);
+                    PrintMessage("Sign Up form is closed!", 1500);
                     _signedIn = false;
                     return null;
                 }
             } while (true);
-            return null;
         }
 
         private User SignIn()
@@ -239,7 +243,7 @@ namespace InternetShop
             {
                 case "1":
                 {
-                    PrintShopBalance();
+                    ShopBalanceMenu();
                     break;
                 }
                 case "2":
@@ -267,6 +271,7 @@ namespace InternetShop
                 }
             }
         }
+        
         private void FindProduct()
         {
             var isFinished = false;
@@ -666,7 +671,7 @@ namespace InternetShop
                     {
                         PrintMessage("New product");
                         InfoPrinter.PrintOneRow("Name: " + itemName, " Price: " + itemPrice + " UAH");
-                        PrintProductDescription(itemDescription);
+                        PrintProductDescription(itemDescription.Trim());
                         if (itemName.Length == 0)
                         {
                             InfoPrinter.PrintOneRow("Enter product name");
@@ -698,7 +703,7 @@ namespace InternetShop
                             do
                             {
                                 msg = Console.ReadLine();
-                                itemDescription += msg.Replace("\n"," ") + " ";
+                                if(msg != "") itemDescription += msg.Trim() + " \n ";
                             } while (msg != "");
                         }
                         else
@@ -725,19 +730,18 @@ namespace InternetShop
                             if (msg.Trim() == "2")
                             {
                                 itemName = "";
-                                break;
+                                continue;
                             }
 
                             if (msg.Trim() == "3")
                             {
                                 itemPrice = 0;
-                                break;
+                                continue;
                             }
 
                             if (msg.Trim() == "4")
                             {
                                 itemDescription = "";
-                                break;
                             }
                         }
                     } while (!isFinished);
@@ -839,12 +843,89 @@ namespace InternetShop
                     } while (!isFinished);
                 }
             } while (!isFinished);
-        } 
-       
+        }
+
+        private void ShopBalanceMenu()
+        {
+            bool isFinished = false;
+            var list = _shop.ShopHistory;
+            var pagesCount = list.Count % 6 == 0 ? list.Count / 6 : list.Count / 6 + 1;
+            var currentPage = 0;
+            do
+            {
+                PrintMessage("Shop balance: " + Math.Round(_shop.ShopBalance,2) + " UAH");
+                InfoPrinter.PrintOneRow("");
+                var currentPageItems = new List<ShopItemHistory>();
+                InfoPrinter.PrintOneRow("Recent purchases");
+                if (pagesCount <= 1)
+                {
+                    foreach (var item in list)
+                    {
+                        InfoPrinter.PrintOneRow("Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH","Buyer: " + item.UserName);
+                    }
+                } 
+                else
+                {
+                    for (int i = currentPage*6; i < currentPage*6+6; i++)
+                    {
+                        try
+                        {
+                            currentPageItems.Add(list[i]);
+                        }
+                        catch (ArgumentOutOfRangeException e)
+                        {
+                            continue;
+                            throw;
+                        }
+                    }
+                    var bottomMenu = "Pages: ";
+                    int leftBorder = currentPage, rightBorder = currentPage;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (leftBorder >= 0) leftBorder--;
+                        else if (rightBorder < pagesCount) rightBorder++;
+                        if (rightBorder < pagesCount) rightBorder++;
+                        else if (leftBorder >= 0) leftBorder--;
+                    }
+                    if(leftBorder >= 0) bottomMenu += "... ";
+                    for (int i = leftBorder+1; i < rightBorder; i++)
+                    {
+                        if (i == currentPage) bottomMenu += "(" + (i + 1) + ") ";
+                        else bottomMenu += (i + 1) + " ";
+                    }
+                    if(pagesCount > rightBorder+1) bottomMenu += "... " + pagesCount;
+                    else if (pagesCount > rightBorder) bottomMenu += pagesCount;
+                    foreach (var item in currentPageItems)
+                    {
+                        InfoPrinter.PrintOneRow("Product: " + item.ItemName + " Price: " + item.ItemPrice + " UAH","Buyer: " + item.UserName);
+                    }
+                    InfoPrinter.PrintOneRow(bottomMenu);
+                }
+                InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
+                var msg = Console.ReadLine();
+                if (msg?.ToLower().Trim() == "y")
+                {
+                    isFinished = true;
+                    continue;
+                }
+                try
+                {
+                    Int32.Parse(msg);
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+                var number = Int32.Parse(msg) - 1;
+                if (number >= 0 && number < pagesCount)
+                    currentPage = number;
+            } while (!isFinished);
+        }
+        
         private string GetAnswer(string question)
         {
             PrintMessage(question);
-            return Console.ReadLine().Trim();
+            return Console.ReadLine()?.Trim();
         }
         
         private bool LeaveQuestion()
@@ -856,14 +937,11 @@ namespace InternetShop
 
         private void PrintMessage(string message, int delay)
         {
+            PrintMessage(message);
             if (delay < 0)
             {
-                PrintMessage(message);
                 return;
             }
-            Console.Clear();
-            InfoPrinter.PrintLine();
-            InfoPrinter.PrintOneRow(message);
             Thread.Sleep(delay);
         }
         
@@ -872,6 +950,7 @@ namespace InternetShop
             Console.Clear();
             InfoPrinter.PrintLine();
             InfoPrinter.PrintOneRow(message);
+            _shop.SaveData();
         }
 
         private void PrintStartMenu()
@@ -925,15 +1004,6 @@ namespace InternetShop
                     InfoPrinter.PrintOneRow("You haven't bought anything yet(");
                 }
             } while(!LeaveQuestion());
-        }
-
-        private void PrintShopBalance()
-        {
-            do
-            {
-                PrintMessage("Shop balance");
-                InfoPrinter.PrintOneRow(_shop.ShopBalance + " UAH");
-            } while (!LeaveQuestion());
         }
 
         private void PrintProductList(List<ShopItem> list)
@@ -993,13 +1063,21 @@ namespace InternetShop
                 }
                 else
                 {
-                    line += word + " ";
-                    i++;
+                    if (word.Contains("\n"))
+                    {
+                        i = 0;
+                        InfoPrinter.PrintRow(line);
+                        line = "";
+                    }
+                    else
+                    {
+                        line += word + " ";
+                        i++;
+                    }
                 }
             }
-            InfoPrinter.PrintRow(line);
+            if(line.Trim() != "") InfoPrinter.PrintRow(line);
             InfoPrinter.PrintOneRow("");
         }
-        
     }
 }

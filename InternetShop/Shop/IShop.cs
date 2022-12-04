@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using InternetShop.Users;
 
 namespace InternetShop.Shop
 {
@@ -12,6 +13,6 @@ namespace InternetShop.Shop
 
         List<ShopItem> GetShopItems(string keyword);
 
-        ShopItem BuyShopItem(string itemName);
+        ShopItem BuyShopItem(string itemName, User user);
     }
 }

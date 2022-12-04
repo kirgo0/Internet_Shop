@@ -111,7 +111,7 @@ namespace InternetShop.Users
                 ShopItem basketItem = Cart[i];
                 if (GetShopItem(basketItem.ItemName) != null)
                 {
-                    Shop.BuyShopItem(basketItem.ItemName);
+                    Shop.BuyShopItem(basketItem.ItemName,this);
                     UserBalance = -basketItem.ItemPrice;
                     PurchaseHistory.Add(basketItem);
                     // Successful buy message
@@ -134,13 +134,14 @@ namespace InternetShop.Users
                 }
             }
         }
-        public bool BuyItem(string itemName)
+
+        public bool BuyItem(string itemName) 
         {
             if (GetShopItem(itemName) != null)
             {
                 ShopItem item = GetShopItem(itemName);
                 if (item.ItemPrice > UserBalance) return false;
-                Shop.BuyShopItem(item.ItemName);
+                Shop.BuyShopItem(item.ItemName,this);
                 UserBalance = -item.ItemPrice;
                 PurchaseHistory.Add(item);
                 return true;

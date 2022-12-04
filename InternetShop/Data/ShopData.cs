@@ -7,11 +7,11 @@ namespace InternetShop.Data
     [JsonObject]
     public class ShopData
     {
-        public List<ShopItem> ShopHistory;
+        public List<ShopItemHistory> ShopHistory { get; set; }
         
         public double ShopBalance;
 
-        public ShopData(List<ShopItem> shopHistory, double shopBalance)
+        public ShopData(List<ShopItemHistory> shopHistory, double shopBalance)
         {
             ShopHistory = shopHistory;
             ShopBalance = shopBalance;
