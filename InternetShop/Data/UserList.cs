@@ -1,19 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
 using InternetShop.Users;
+using Newtonsoft.Json;
 
 
 namespace InternetShop.Data
 {
-    [DataContract]
-    [KnownType(typeof(Admin))]
-    [KnownType(typeof(DefaultUser))]
-    public class UserList
+    [JsonObject]
+    public class UserData
     {
-        [DataMember]
         public List<User> List { get; set; }
 
-        public UserList(List<User> list)
+        public UserData(List<User> list)
         {
             List = list;
         }

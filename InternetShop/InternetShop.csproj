@@ -43,8 +43,11 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Data\DataSerializer.cs" />
+        <Compile Include="Data\ILoader.cs" />
         <Compile Include="Data\InfoPrinter.cs" />
-        <Compile Include="Data\ItemList.cs" />
+        <Compile Include="Data\ItemData.cs" />
+        <Compile Include="Data\ShopData.cs" />
         <Compile Include="Data\UserList.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

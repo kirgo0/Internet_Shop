@@ -21,10 +21,6 @@ namespace InternetShop
 
         public void Run()
         {
-            // for (int i = 0; i < 28; i++)
-            // {
-            //     _shop.CreateNewShopItem("NVIDIA GTX 1060 6GB" + " (" + i + ")", 15600,"The PNY GeForce GTX 1060 graphics card is loaded with innovative new gaming technologies, making it the perfect choice for the latest high-definition games. Powered by NVIDIA Pascal™ – the most advanced GPU architecture ever created – the GeForce GTX 1060 delivers brilliant performance that opens the door to virtual reality and beyond.");
-            // }
             _shop.GetData();
             while(true)
             {
@@ -707,45 +703,42 @@ namespace InternetShop
                         }
                         else
                         {
-                            do
+                            InfoPrinter.PrintOneRow("1. Create new product");
+                            InfoPrinter.PrintOneRow("2. Change product name");
+                            InfoPrinter.PrintOneRow("3. Change product price");
+                            InfoPrinter.PrintOneRow("4. Change product description");
+                            InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
+                            msg = Console.ReadLine();
+                            if (msg.ToLower().Trim() == "y") isFinished = true;
+                            if (msg.Trim() == "1")
                             {
-                                InfoPrinter.PrintOneRow("1. Create new product");
-                                InfoPrinter.PrintOneRow("2. Change product name");
-                                InfoPrinter.PrintOneRow("3. Change product price");
-                                InfoPrinter.PrintOneRow("4. Change product description");
-                                InfoPrinter.PrintOneRow("Do you want to come back? (Y)");
-                                msg = Console.ReadLine();
-                                if (msg.ToLower().Trim() == "y") isFinished = true;
-                                if (msg.Trim() == "1")
+                                if (_admin.CreateNewItem(itemName, itemPrice, itemDescription))
                                 {
-                                    if (_admin.CreateNewItem(itemName, itemPrice, itemDescription))
-                                    {
-                                        PrintMessage("New product was successfully created!", 1500);
-                                        isFinished = true;
-                                    }
-                                    else
-                                    {
-                                        PrintMessage("A product with this name already exists");
-                                    }
+                                    PrintMessage("New product was successfully created!", 1500);
+                                    isFinished = true;
                                 }
-                                if (msg.Trim() == "2")
+                                else
                                 {
-                                    itemName = "";
-                                    break;
+                                    PrintMessage("A product with this name already exists");
                                 }
+                            }
+                            if (msg.Trim() == "2")
+                            {
+                                itemName = "";
+                                break;
+                            }
 
-                                if (msg.Trim() == "3")
-                                {
-                                    itemPrice = 0;
-                                    break;
-                                }
+                            if (msg.Trim() == "3")
+                            {
+                                itemPrice = 0;
+                                break;
+                            }
 
-                                if (msg.Trim() == "4")
-                                {
-                                    itemDescription = "";
-                                    break;
-                                }
-                            } while (!isFinished);
+                            if (msg.Trim() == "4")
+                            {
+                                itemDescription = "";
+                                break;
+                            }
                         }
                     } while (!isFinished);
                 }

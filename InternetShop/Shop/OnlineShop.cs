@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Threading;
 using InternetShop.Data;
 using InternetShop.Users;
 using Newtonsoft.Json;
@@ -77,39 +73,6 @@ namespace InternetShop.Shop
         }
 
         // Class methods
-
-        public void SaveData()
-        {
-            var userList = new UserList(_users);
-            var dbContextJson = JsonConvert.SerializeObject(userList, Formatting.Indented, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            });
-            File.WriteAllText("users.json", dbContextJson);
-        }
-        
-        public void GetData()
-        {
-            try
-            {
-                var data = File.ReadAllText("users.json");
-                var userList = JsonConvert.DeserializeObject<UserList>(data, new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto
-                });
-                if (userList == null) return;
-                _users = userList.List;
-                foreach (var user in _users)
-                {
-                    user.GetShop(this);
-                }
-            }
-            catch (IOException e)
-            {
-                _users = new List<User>();
-            }
-        }
-
         public User SignUpAdmin(string userName, string password, string passwordRepeat)
         {
             if (GetUser(userName) != null) return null;
@@ -145,7 +108,54 @@ namespace InternetShop.Shop
             return null;
         }
         
-        // Print methods
+        // Save Data Methods
+        
+        public void SaveData()
+        {
+            var userList = new UserData(_users);
+            var itemList = new ItemData(ProductList);
+            var dataJson = JsonConvert.SerializeObject(userList, Formatting.Indented, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            });
+            File.WriteAllText("users.json", dataJson);
+            dataJson = JsonConvert.SerializeObject(itemList, Formatting.Indented, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            });
+            File.WriteAllText("items.json", dataJson);
+        }
+        
+        public void GetData()
+        {
+            try
+            {
+                var data = File.ReadAllText("users.json");
+                var userList = JsonConvert.DeserializeObject<UserData>(data, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
+                if (userList == null) return;
+                _users = userList.List;
+                foreach (var user in _users)
+                {
+                    user.GetShop(this);
+                }
+                // product loader
+                data = File.ReadAllText("items.json");
+                var itemList = JsonConvert.DeserializeObject<ItemData>(data, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
+                if(itemList == null) return;
+                ProductList = itemList.List;
+            }
+            catch (IOException e)
+            {
+                _users = new List<User>();
+            }
+        }
+
 
     }
 }
