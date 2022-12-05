@@ -1,4 +1,3 @@
-using InternetShop.Users;
 using Newtonsoft.Json;
 
 namespace InternetShop.Shop

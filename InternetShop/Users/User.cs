@@ -9,7 +9,6 @@ namespace InternetShop.Users
     [JsonObject]
     public abstract class User 
     {
-        // [DataMember]
         protected IShop Shop { get; set; }
         
         public string UserName { get; set; }
@@ -18,7 +17,7 @@ namespace InternetShop.Users
         private string Password { get; set; }
 
         [JsonRequired]
-        private int _balance { get; set; }
+        private int Balance { get; set; }
 
         [JsonRequired]
         public AccountType CheckAccountType { get; set; }
@@ -26,17 +25,17 @@ namespace InternetShop.Users
         [JsonIgnore]
         public int UserBalance
         {
-            get => _balance;
-            set => _balance += value;
+            get => Balance;
+            set => Balance += value;
         }
-        // [DataMember]        
+        
         public readonly List<ShopItem> Cart;
-        // [DataMember]        
+        
         public readonly List<ShopItem> PurchaseHistory;
 
         protected User(int balance, List<ShopItem> cart, List<ShopItem> purchaseHistory, IShop shop, string userName, string password, AccountType checkAccountType)
         {
-            _balance = balance;
+            Balance = balance;
             Cart = cart;
             PurchaseHistory = purchaseHistory;
             Shop = shop;
@@ -50,14 +49,13 @@ namespace InternetShop.Users
             UserName = userName;
             Password = password;
             CheckAccountType = checkAccountType;
-            UserBalance = 100000;
+            UserBalance = 0;
             Cart = new List<ShopItem>();
             PurchaseHistory = new List<ShopItem>();
         }
         
         public bool SignIn(string userName, string password)
         {
-            // Sign in message
             return UserName == userName && Password == password;
         }
         public void GetShop(IShop shop)
@@ -81,18 +79,17 @@ namespace InternetShop.Users
                 Cart.RemoveAt(pos);
                 return true;
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 return false;
             }
         }
         public bool AddShopItemToCart(string itemName)
         {
-            ShopItem item = GetShopItem(itemName);
+            var item = GetShopItem(itemName);
             if(item != null)
             {
                 Cart.Add(item);
-                // Successful add to basket message
             }
             return true;
         }
@@ -108,7 +105,7 @@ namespace InternetShop.Users
             if (sum > UserBalance) return false;
             for(var i = 0; i < Cart.Count; i++)
             {
-                ShopItem basketItem = Cart[i];
+                var basketItem = Cart[i];
                 if (GetShopItem(basketItem.ItemName) != null)
                 {
                     Shop.BuyShopItem(basketItem.ItemName,this);
@@ -139,7 +136,7 @@ namespace InternetShop.Users
         {
             if (GetShopItem(itemName) != null)
             {
-                ShopItem item = GetShopItem(itemName);
+                var item = GetShopItem(itemName);
                 if (item.ItemPrice > UserBalance) return false;
                 Shop.BuyShopItem(item.ItemName,this);
                 UserBalance = -item.ItemPrice;

@@ -1,6 +1,4 @@
-﻿using InternetShop.Shop;
-
-namespace InternetShop.Users
+﻿namespace InternetShop.Users
 {
     public interface IAdmin
     {        

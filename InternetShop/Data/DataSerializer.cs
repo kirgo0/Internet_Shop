@@ -45,7 +45,7 @@ namespace InternetShop.Data
                 _userData = data._userData;
                 loader.LoadData(_shopData.ShopHistory,_shopData.ShopBalance,_userData.List,_itemData.List);
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 loader.LoadData(new List<ShopItemHistory>(),0.0,new List<User>(),new List<ShopItem>());
             }

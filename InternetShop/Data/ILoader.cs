@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using InternetShop.Shop;
 using InternetShop.Users;

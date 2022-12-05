@@ -1,8 +1,4 @@
-﻿using System;
-using System.Runtime.Serialization;
-using InternetShop.Shop;
-
-namespace InternetShop.Users
+﻿namespace InternetShop.Users
 {
     public class Admin : User , IAdmin
     {

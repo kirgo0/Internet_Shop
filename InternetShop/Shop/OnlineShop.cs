@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using InternetShop.Data;
 using InternetShop.Users;
-using Newtonsoft.Json;
-
 namespace InternetShop.Shop
 {
     public class OnlineShop : IShop, ILoader
@@ -11,22 +8,19 @@ namespace InternetShop.Shop
         private List<User> _users = new List<User>();
         public List<ShopItem> ProductList = new List<ShopItem>();
         public List<ShopItemHistory> ShopHistory = new List<ShopItemHistory>();
-        public double ShopBalance = 0;
-        private double ShopProfit
+        private double _shopBalance;
+        public double ShopProfit
         {
-            get => ShopBalance;
-            set => ShopBalance += value < 10000 ? value * 0.05 : value * 0.1;
+            get => _shopBalance;
+            private set => _shopBalance += value < 10000 ? value * 0.05 : value * 0.1;
         }
 
         // Interface methods
         public bool CreateNewShopItem(string itemName, int itemPrice, string itemDescription)
         {
-            if (GetShopItem(itemName) == null)
-            {
-                ProductList.Add(new ShopItemExtended(itemName,itemPrice,itemDescription));
-                return true;
-            }
-            return false;
+            if (GetShopItem(itemName) != null) return false;
+            ProductList.Add(new ShopItemExtended(itemName,itemPrice,itemDescription));
+            return true;
         }
 
         public bool ChangeShopItem(string itemName, string newItemName, int newItemPrice, string newItemDescription)
@@ -149,13 +143,13 @@ namespace InternetShop.Shop
 
         public double GetShopBalance()
         {
-            return ShopBalance;
+            return _shopBalance;
         }
 
         public void LoadData(List<ShopItemHistory> shopHistory, double shopBalance, List<User> users, List<ShopItem> productList)
         {
             if(shopHistory != null) ShopHistory = shopHistory;
-            ShopBalance = shopBalance;
+            _shopBalance = shopBalance;
             if(users != null) _users = users;
             if(productList != null) ProductList = productList;
         }
