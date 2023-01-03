@@ -1,7 +1,14 @@
-﻿namespace InternetShop.Users
+﻿using Newtonsoft.Json;
+
+namespace InternetShop.Users
 {
     public class Admin : User , IAdmin
     {
+        
+        [JsonConstructor]
+        public Admin() : base(AccountType.Admin)
+        {
+        }
         public Admin(string userName, string password) : base(userName, password, AccountType.Admin)
         {
         }

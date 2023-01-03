@@ -61,6 +61,7 @@
         <Compile Include="Users\Admin.cs" />
         <Compile Include="Users\DefaultUser.cs" />
         <Compile Include="Users\IAdmin.cs" />
+        <Compile Include="Users\IBuyer.cs" />
         <Compile Include="Users\User.cs" />
     </ItemGroup>
     <ItemGroup>

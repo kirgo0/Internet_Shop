@@ -9,7 +9,6 @@ namespace InternetShop
             OnlineShop shop = new OnlineShop();
             ShopController controller = new ShopController(shop);
             controller.Run();
-            
         }
     }
 }
