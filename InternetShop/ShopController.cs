@@ -13,6 +13,7 @@ namespace InternetShop
         private User _user;
         private bool _signedIn;
         private bool _adminMode;
+        private IBuyer _buyer;
         private IAdmin _admin;
         public ShopController(OnlineShop shop)
         {
@@ -111,7 +112,6 @@ namespace InternetShop
                             _signedIn = false;
                             return null;
                         }
-
                         continue;
                     }
 
@@ -165,6 +165,7 @@ namespace InternetShop
                     {
                         _adminMode = false;
                         _admin = null;
+                        _buyer = (IBuyer) user;
                         PrintMessage(user.UserName +  " you are successfully Signed In!",1500);
                     }
                     _signedIn = true;
@@ -229,6 +230,7 @@ namespace InternetShop
                     case "6":
                     {
                         _user = null;
+                        _buyer = null;
                         _signedIn = false;
                         break;
                     }
@@ -417,7 +419,7 @@ namespace InternetShop
         {
             do
             {
-                _user.CheckCartProducts();
+                _buyer.CheckCartProducts();
                 PrintMessage("Your cart");
                 if (_user.Cart.Count != 0)
                 {
@@ -438,7 +440,7 @@ namespace InternetShop
                         PrintMessage("Are you sure you want to buy all products from your cart? (Y) to confirm (any key) to come back");
                         msg = Console.ReadLine();
                         if(MessageFormatter(msg) != "y") continue;
-                        if (_user.BuyItemsFromCart())
+                        if (_buyer.BuyItemsFromCart())
                         {
                             PrintMessage("All products were successfully purchased",1500);
                         }
@@ -473,7 +475,7 @@ namespace InternetShop
                                 try
                                 {
                                     var number = int.Parse(listNumber);
-                                    if (_user.RemoveShopItemFromCart(number-1))
+                                    if (_buyer.RemoveShopItemFromCart(number-1))
                                     {
                                         PrintMessage("This product was removed from your cart",1500);
                                     }
@@ -511,7 +513,7 @@ namespace InternetShop
                         try
                         {
                             var number = int.Parse(listNumber);
-                            if (_user.RemoveShopItemFromCart(number - 1))
+                            if (_buyer.RemoveShopItemFromCart(number - 1))
                             {
                                 PrintMessage("This item was removed from your cart", 1500);
                                 break;
@@ -593,7 +595,7 @@ namespace InternetShop
                     }
                     switch (msg.Trim())
                     {
-                        case "1" when _user.AddShopItemToCart(item.ItemName):
+                        case "1" when _buyer.AddShopItemToCart(item.ItemName):
                             PrintMessage(item.ItemName + " was successfully added to your cart!",1500);
                             break;
                         case "1":
@@ -603,7 +605,7 @@ namespace InternetShop
                         {
                             if (GetAnswer("You sure you want to buy a " + item.ItemName + "? (Y) to confirm").ToLower() == "y")
                             {
-                                if(_user.BuyItem(item.ItemName)) PrintMessage("You successfully buy a " + item.ItemName,1500);
+                                if(_buyer.BuyItem(item.ItemName)) PrintMessage("You successfully buy a " + item.ItemName,1500);
                                 else PrintMessage("Unexpected error, form closed",1500);
                             }
                             break;
